@@ -19,8 +19,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include <string.h>
+#include <stdio.h>
 
 /* USER CODE END Includes */
 
@@ -32,7 +36,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define RX_BUFFER_SIZE 100
+#define RX_BUFFER1_SIZE 100
+#define RX_BUFFER3_SIZE 100
 
 /* USER CODE END PD */
 
@@ -56,9 +61,15 @@ osThreadId State_machineHandle;
 osThreadId Update_screenHandle;
 osThreadId Update_measureHandle;
 /* USER CODE BEGIN PV */
+
 uint8_t state; // Etat pour la machine à état
 
-uint8_t rxBuffer[RX_BUFFER_SIZE];   // Buffer de réception pour les données
+uint8_t rx_char1, rx_char3; // UART1 = 232_418 et UART3 = 232_COM
+uint8_t rx_buffer1[RX_BUFFER1_SIZE];
+uint8_t rx_buffer3[RX_BUFFER3_SIZE];
+uint16_t rx_index1 = 0, rx_index3 = 0;
+uint8_t message_complete1 = 0;
+uint8_t message_complete3 = 0;
 
 /* USER CODE END PV */
 
@@ -77,7 +88,14 @@ void Update_Measures(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+void send_UART1(const char *msg);
+void send_UART3(const char *msg);
+void start_UART_Reception(void);
 void TEST_STATE_MACHINE(void);
+
+/* USER CODE END PFP */
+
 
 /* USER CODE END PFP */
 
@@ -363,7 +381,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 9600;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -396,7 +414,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
+  huart2.Init.BaudRate = 9600;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -530,28 +548,35 @@ static void MX_GPIO_Init(void)
 void TEST_STATE_MACHINE(void){
 //------------------------------- TRANSITIONS
 	switch(state){
-	case 0:case 4:case 5:case 6:
-		if(HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == 0){
-      state++;
-    } else if (HAL_GPIO_ReadPin(BP3_GPIO_Port, BP3_Pin) == 0){
+	case 0:
+	case 4:
+	case 5:
+	case 6:
+	    if (HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET)
+	    {
+	        state++;
+	    }
+	    else if (HAL_GPIO_ReadPin(BP3_GPIO_Port, BP3_Pin) == GPIO_PIN_RESET)
+	    {
+	        if (state > 0)
+	        {
+	            state--;
+	        }
+	    }
+	    break;
 
-      if(state == 0){
-      } else {
-        state--;
-      }
-    }
-    
-		break;
 
   case 1:
   // Envoi de trames RS232 --> PER= puis verif que PER n'est pas vide 
-    if(HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == 0){ // Ajouter si lecture PER=????????
-      state++;
-    }
+	  if (strstr((char *)rx_buffer1, "PER=") && strlen((char *)rx_buffer1) == 11)
+	          {
+	              state++;
+	              message_complete1 = 0;
+	          }
     break;
 
   case 2:
-    if(HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == 0){ // Ou si lecture terminal tout ok
+    if(HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET){ // Ou si lecture terminal tout ok
       state++;
     }
     break;
@@ -561,7 +586,7 @@ void TEST_STATE_MACHINE(void){
   break;
   
   case 7:
-    if(HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == 0){
+    if(HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET){
       state = 0;
     }
     break;
@@ -572,21 +597,117 @@ void TEST_STATE_MACHINE(void){
 	switch(state){
 	case 0:
   // Afficher sur écran LCD --> Appuyer sur le BP pour commencer le test
+		send_UART3("Etat 0: Pret a commencer le test\n");
 		break;
-  case 1:
+	case 1:
   // Afficher sur écran LCD mesurer base de temps, l'utilisateur doit envoyer la trame, lire la trame envoyé + envoyer à la carte
-    break; 
+	{
+	    static uint8_t demande_envoyee = 0;
+
+	    if (!demande_envoyee)
+	    {
+	        send_UART3("Entrez la base de temps (7 digits) :\n");
+	        demande_envoyee = 1;
+	    }
+
+	    if (message_complete3)
+	    {
+	        // Vérifie que le message commence par PER= et contient exactement 11 caractères
+	        if (strstr((char *)rx_buffer3, "PER=") == (char *)rx_buffer3 && strlen((char *)rx_buffer3) == 11)
+	        {
+	            // Vérifie que les 7 derniers caractères sont des chiffres
+	            uint8_t format_valide = 1;
+	            for (int i = 4; i < 11; i++)
+	            {
+	                if (rx_buffer3[i] < '0' || rx_buffer3[i] > '9')
+	                {
+	                    format_valide = 0;
+	                    break;
+	                }
+	            }
+
+	            if (format_valide)
+	            {
+	                send_UART1((char *)rx_buffer3);
+	                send_UART1("\n");
+	                state++;
+	                demande_envoyee = 0;
+	            }
+	            else
+	            {
+	                send_UART3("Erreur : format invalide. Recommencez.\n");
+	            }
+	        }
+	        else
+	        {
+	            send_UART3("Erreur : format invalide. Recommencez.\n");
+	        }
+
+	        message_complete3 = 0; // On met à jour le flag pour indiquer que le message a été traité
+	        rx_index3 = 0; // On réinitialise l'index qui permet le traitement du message
+	    }
+	}
+	break;
+
+
+	case 2:
+		break;
 
 	}
 
 
 }
 
-//----------------------------------------------------------------------------------- FONCTION RECEPTION DE DONNEES USART1
-void send_message(const char* message)
+//----------------------------------------------------------------------------------- CALLBACK RECEPTION DE DONNEES USART1
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
+    if (huart->Instance == USART1)
+    {
+        if (rx_char1 != '\n' && rx_index1 < RX_BUFFER1_SIZE - 1)
+        {
+            rx_buffer1[rx_index1++] = rx_char1;
+        }
+        else
+        {
+            rx_buffer1[rx_index1] = '\0';
+            message_complete1 = 1;
+            rx_index1 = 0;
+        }
+        HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
+    }
+    else if (huart->Instance == USART3)
+    {
+        if (rx_char3 != '\n' && rx_index3 < RX_BUFFER3_SIZE - 1)
+        {
+            rx_buffer3[rx_index3++] = rx_char3;
+        }
+        else
+        {
+            rx_buffer3[rx_index3] = '\0';
+            message_complete3 = 1;
+            rx_index3 = 0;
+        }
+        HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
+    }
 }
+
+//----------------------------------------------------------------------------------- FONCTION DE TRANSMISSION DES DONNES
+void send_UART1(const char *msg)
+{
+    HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
+}
+
+void send_UART3(const char *msg)
+{
+    HAL_UART_Transmit(&huart3, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
+}
+
+void start_UART_Reception()
+{
+    HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
+    HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
+}
+
 
 /* USER CODE END 4 */
 
