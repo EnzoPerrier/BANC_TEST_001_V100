@@ -31,6 +31,19 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+typedef struct { // Struct Trame de  retour STS
+    char ver[32];
+    char crc[32];
+    char lan[16];
+    float acc;
+    float bat;
+    float cel_val;
+    char cel_mode;
+    char lum;
+    bool dips[8];   // true = ON, false = OFF
+    bool inps[3];   // true = ON, false = OFF (si jamais ça change)
+} TrameDataSTS;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -70,6 +83,7 @@ uint8_t rx_buffer3[RX_BUFFER3_SIZE];
 uint16_t rx_index1 = 0, rx_index3 = 0;
 uint8_t message_complete1 = 0;
 uint8_t message_complete3 = 0;
+char per_value[8] = {0};
 
 /* USER CODE END PV */
 
@@ -140,6 +154,8 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
+
+  start_UART_Reception(); // Initialise la réception UART1 et 3
 
   /* USER CODE END 2 */
 
@@ -370,7 +386,7 @@ static void MX_TIM1_Init(void)
   * @param None
   * @retval None
   */
-static void MX_USART1_UART_Init(void)
+static void MX_USART1_UART_Init(void) // RS232 --> EL418
 {
 
   /* USER CODE BEGIN USART1_Init 0 */
@@ -381,7 +397,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
+  huart1.Init.BaudRate = 9600;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -403,7 +419,7 @@ static void MX_USART1_UART_Init(void)
   * @param None
   * @retval None
   */
-static void MX_USART2_UART_Init(void)
+static void MX_USART2_UART_Init(void) // RS485 
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
@@ -436,7 +452,7 @@ static void MX_USART2_UART_Init(void)
   * @param None
   * @retval None
   */
-static void MX_USART3_UART_Init(void)
+static void MX_USART3_UART_Init(void) //RS232-->Com
 {
 
   /* USER CODE BEGIN USART3_Init 0 */
@@ -447,7 +463,7 @@ static void MX_USART3_UART_Init(void)
 
   /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
+  huart3.Init.BaudRate = 9600;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
@@ -545,118 +561,149 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void TEST_STATE_MACHINE(void){
-//------------------------------- TRANSITIONS
-	switch(state){
-	case 0:
-	case 4:
-	case 5:
-	case 6:
-	    if (HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET)
-	    {
-	        state++;
-	    }
-	    else if (HAL_GPIO_ReadPin(BP3_GPIO_Port, BP3_Pin) == GPIO_PIN_RESET)
-	    {
-	        if (state > 0)
-	        {
-	            state--;
-	        }
-	    }
-	    break;
+void TEST_STATE_MACHINE(void)
+{
+    static uint8_t action_done = 0; // pour eviter repetition des messages
+
+    //--------------------------- TRANSITIONS
+    switch (state)
+    {
+    case 0:
+    case 2:
+        if (HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET)
+            state++;
+        else if (HAL_GPIO_ReadPin(BP3_GPIO_Port, BP3_Pin) == GPIO_PIN_RESET && state > 0)
+            state--;
+        break;
+
+    case 1:
+        if (message_complete3)
+        {
+            message_complete3 = 0;
+
+            if (strlen((char *)rx_buffer3) == 8)
+            {
+                strcpy(per_value, (char *)rx_buffer3);
+
+                char per_command[20];
+                sprintf(per_command, "PER=%s\n", per_value);
+                send_UART1(per_command);     // Envoi vers UART1
+                HAL_Delay(500);              // Petite pause 
+                send_UART1("PER=\n");        // Demande de relecture
+            }
+            else
+            {
+                send_UART3("Format invalide. Le PER est  sur 8 digits, recommencez...\n");
+            }
+        }
+
+        if (message_complete1)
+        {
+            message_complete1 = 0;
+
+            char expected_response[20];
+            sprintf(expected_response, "PER=%s", per_value);
+
+            if (strstr((char *)rx_buffer1, expected_response) == (char *)rx_buffer1)
+            {
+                send_UART3("PER VALIDE --> Etape suivante\n")
+                HAL_Delay(500);
+                state++;
+                action_done = 0; // Reset pour l'action suivante
+            }
+            else
+            {
+                send_UART3("Valeur differente. Entrez a nouveau:\n");
+            }
+        }
+        break;
+
+    case 3:
+
+    if (message_complete1)
+        {
+            message_complete1 = 0;
+
+            TrameDataSTS data = {0}; // Initialisation à zéro 
+
+            parse_data_STS(rx_buffer1, &data);
+
+            if((data.acc >= 8.5  && data.acc <= 10) && (data.bat >= 11.5 &&  data.bat <= 13) && dips[]  = {1, 1, 1, 1, 1, 1, 1, 1})
+            {
+              send_UART3("STS OK --> Etape suivante\n");
+              HAL_Delay(500);
+              state++;
+            }
+        }
+
+        break;
+
+        case 4:
 
 
-  case 1:
-  // Envoi de trames RS232 --> PER= puis verif que PER n'est pas vide 
-	  if (strstr((char *)rx_buffer1, "PER=") && strlen((char *)rx_buffer1) == 11)
-	          {
-	              state++;
-	              message_complete1 = 0;
-	          }
-    break;
-
-  case 2:
-    if(HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET){ // Ou si lecture terminal tout ok
-      state++;
+    case 7:
+        if (HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET)
+        {
+            state = 0;
+            action_done = 0;
+        }
+        break;
     }
-    break;
 
-  case 3: 
-  // Lecture des entrées --> OK si lecture terminal Ok
-  break;
-  
-  case 7:
-    if(HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET){
-      state = 0;
+    //--------------------------- ACTIONS
+    switch (state)
+    {
+    case 0:
+        if (!action_done)
+        {
+            send_UART3("Appuyer sur le  bouton pour commencer\n");
+            action_done = 1;
+        }
+        break;
+
+    case 1:
+        if (!action_done)
+        {
+            send_UART3("Entrez les PER (juste la valeur sur 8 digits\n");
+            action_done = 1;
+        }
+        break;
+
+    case 2:
+        if (!action_done)
+        {
+            send_UART3("mettez tous les DIPs sur ON, une fois fait appuyez sur le bouton\n");
+
+            action_done = 1;
+        }
+        break;
+
+    case 3:
+        if (!action_done)
+        {
+            send_UART3("Test STS en  cours...\n");
+            send_UART1("STS");
+            action_done = 1;
+        }
+        break;
+
+    case 4:
+        if (!action_done)
+        {
+            send_UART3("Test entrees en  cours...\n");
+            GPIO_PIN_SET()
+            action_done = 1;
+        }
+        break;
+
+        
+      break;
+
+    default:
+        break;
     }
-    break;
-
-	}
-
-//------------------------------- ACTIONS
-	switch(state){
-	case 0:
-  // Afficher sur écran LCD --> Appuyer sur le BP pour commencer le test
-		send_UART3("Etat 0: Pret a commencer le test\n");
-		break;
-	case 1:
-  // Afficher sur écran LCD mesurer base de temps, l'utilisateur doit envoyer la trame, lire la trame envoyé + envoyer à la carte
-	{
-	    static uint8_t demande_envoyee = 0;
-
-	    if (!demande_envoyee)
-	    {
-	        send_UART3("Entrez la base de temps (7 digits) :\n");
-	        demande_envoyee = 1;
-	    }
-
-	    if (message_complete3)
-	    {
-	        // Vérifie que le message commence par PER= et contient exactement 11 caractères
-	        if (strstr((char *)rx_buffer3, "PER=") == (char *)rx_buffer3 && strlen((char *)rx_buffer3) == 11)
-	        {
-	            // Vérifie que les 7 derniers caractères sont des chiffres
-	            uint8_t format_valide = 1;
-	            for (int i = 4; i < 11; i++)
-	            {
-	                if (rx_buffer3[i] < '0' || rx_buffer3[i] > '9')
-	                {
-	                    format_valide = 0;
-	                    break;
-	                }
-	            }
-
-	            if (format_valide)
-	            {
-	                send_UART1((char *)rx_buffer3);
-	                send_UART1("\n");
-	                state++;
-	                demande_envoyee = 0;
-	            }
-	            else
-	            {
-	                send_UART3("Erreur : format invalide. Recommencez.\n");
-	            }
-	        }
-	        else
-	        {
-	            send_UART3("Erreur : format invalide. Recommencez.\n");
-	        }
-
-	        message_complete3 = 0; // On met à jour le flag pour indiquer que le message a été traité
-	        rx_index3 = 0; // On réinitialise l'index qui permet le traitement du message
-	    }
-	}
-	break;
-
-
-	case 2:
-		break;
-
-	}
-
-
 }
+
 
 //----------------------------------------------------------------------------------- CALLBACK RECEPTION DE DONNEES USART1
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
@@ -691,7 +738,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
 }
 
-//----------------------------------------------------------------------------------- FONCTION DE TRANSMISSION DES DONNES
+//----------------------------------------------------------------------------------- FONCTIONS DE TRANSMISSION DES DONNES
 void send_UART1(const char *msg)
 {
     HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
@@ -702,10 +749,73 @@ void send_UART3(const char *msg)
     HAL_UART_Transmit(&huart3, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
 }
 
+//----------------------------------------------------------------------------------- Start réception
 void start_UART_Reception()
 {
     HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
     HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
+}
+
+//----------------------------------------------------------------------------------- FONCTION DE PARSING STS
+
+void parse_data_STS(const char *trame, TrameData *data)
+{
+    char line[128];
+    const char *ptr = trame;
+
+    while (*ptr)
+    {
+        // Extraire une ligne complète
+        int len = 0;
+        while (*ptr && *ptr != '\n' && len < sizeof(line) - 1)
+        {
+            line[len++] = *ptr++;
+        }
+        if (*ptr == '\n')
+            ptr++; // Sauter '\n'
+        line[len] = '\0';
+
+        // Analyse ligne par ligne
+        if (sscanf(line, "VER = %31s", data->ver) == 1)
+            continue;
+        if (sscanf(line, "CRC = %31s", data->crc) == 1)
+            continue;
+        if (sscanf(line, "LAN = %15s", data->lan) == 1)
+            continue;
+        if (sscanf(line, "ACC = %f v", &data->acc) == 1)
+            continue;
+        if (sscanf(line, "BAT = %f v", &data->bat) == 1)
+            continue;
+        if (sscanf(line, "CEL = %f v", &data->cel_val) == 1)
+            continue;
+        if (sscanf(line, "CEL = %c", &data->cel_mode) == 1)
+            continue;
+        if (sscanf(line, "LUM = %c", &data->lum) == 1)
+            continue;
+
+        // DIP (1 à 8)
+        if (strncmp(line, "DIP =", 5) == 0)
+        {
+            for (int i = 0; i < 8; i++) // 8  DIPs
+            {
+                char pattern[8];
+                sprintf(pattern, "%d:ON", i + 1); // Exemple j'ai 1:ON  2:OFF--> 10
+                data->dips[i] = strstr(line, pattern) != NULL;
+        }
+
+        // INP (1 à 3)
+        if (strncmp(line, "INP =", 5) == 0) // 3 entrées
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                char pattern[8];
+                sprintf(pattern, "%d:ON", i + 1);
+                data->inps[i] = strstr(line, pattern) != NULL;
+            }
+            continue;
+        }
+    }
+  }
 }
 
 
@@ -724,6 +834,7 @@ void Update_StateMachine(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+    TEST_STATE_MACHINE();
     osDelay(1);
   }
   /* USER CODE END 5 */
