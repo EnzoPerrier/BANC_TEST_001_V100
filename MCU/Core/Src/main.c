@@ -662,17 +662,19 @@ void TEST_STATE_MACHINE(void) {
         case 3:
             if (!action_done) {
                 send_UART3("Test STS en cours...\n");
-                send_UART1("STS");
+                send_UART1("STS\n");
+                send_UART3(rx_buffer1);
                 action_done = 1;
             }
             break;
         case 4:
             if (!action_done) {
                 send_UART3("Test entrees en cours...\n");
+                // Activation de toutes les entrées
                 HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
                 HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
                 HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
-                HAL_Delay(100);
+                HAL_Delay(300);
                 send_UART1("STS\n");
                 action_done = 1;
             }
