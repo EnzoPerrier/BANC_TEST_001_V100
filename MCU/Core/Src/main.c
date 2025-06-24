@@ -764,7 +764,7 @@ void start_UART_Reception()
 
 //----------------------------------------------------------------------------------- FONCTION DE PARSING STS
 
-void parse_data_STS(const char *trame, TrameData *data)
+void parse_data_STS(const char *trame, TrameDataSTS *data)
 {
   char line[128];
   const char *ptr = trame;
