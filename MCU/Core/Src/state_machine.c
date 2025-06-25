@@ -6,6 +6,10 @@
  */
 
 #include "state_machine.h"
+#include <string.h>
+#include <stdio.h>
+
+uint8_t state = 0;
 
 void state_machine_func(){
     static uint8_t action_done = 0;
