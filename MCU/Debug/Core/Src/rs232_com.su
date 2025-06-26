@@ -1,4 +1,0 @@
-../Core/Src/rs232_com.c:15:6:RS232_COM_Init	8	static
-../Core/Src/rs232_com.c:20:6:send_UART3	16	static
-../Core/Src/rs232_com.c:25:6:process_UART3_data	4	static
-../Core/Src/rs232_com.c:36:6:HAL_UART_RxCpltCallback	16	static

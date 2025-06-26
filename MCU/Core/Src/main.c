@@ -25,15 +25,16 @@
 
 #include <string.h>
 #include <stdio.h>
-
+/*
 #include "rs232_com.h"
 #include "rs232_418.h"
-#include "rs485.h"
+#include "rs485.h"*/
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+/*************************************************** STRUCTURE PARSE TRAME STS
 typedef struct
 { // Struct Trame de  retour STS
   char ver[32];
@@ -46,15 +47,12 @@ typedef struct
   char lum;
   bool dips[8]; // true = ON, false = OFF
   bool inps[3]; // true = ON, false = OFF (si jamais ça change)
-} TrameDataSTS;
+} TrameDataSTS;*/
 
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
-#define RX_BUFFER1_SIZE 100
-#define RX_BUFFER3_SIZE 100
 
 /* USER CODE END PD */
 
@@ -74,18 +72,15 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
-osThreadId State_machineHandle;
+/* Definitions for defaultTask */
+osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* USER CODE BEGIN PV */
 
-uint8_t state; // Etat pour la machine à état
-
-extern uint8_t rx_char1, rx_char3; // UART1 = 232_418 et UART3 = 232_COM
-extern uint8_t rx_buffer1[RX_BUFFER1_SIZE];
-extern uint8_t rx_buffer3[RX_BUFFER3_SIZE];
-uint16_t rx_index1 = 0, rx_index3 = 0;
-uint8_t message_complete1 = 0;
-uint8_t message_complete3 = 0;
-char per_value[8] = {0};
 
 /* USER CODE END PV */
 
@@ -98,7 +93,7 @@ static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM1_Init(void);
-void Update_StateMachine(void const * argument);
+void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -152,9 +147,11 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
-  start_UART_Reception(); // Initialise la réception UART1 et 3
 
   /* USER CODE END 2 */
+
+  /* Init scheduler */
+  osKernelInitialize();
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -173,13 +170,16 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of State_machine */
-  osThreadDef(State_machine, Update_StateMachine, osPriorityNormal, 0, 128);
-  State_machineHandle = osThreadCreate(osThread(State_machine), NULL);
+  /* creation of defaultTask */
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
   osKernelStart();
@@ -551,23 +551,24 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 
+
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_Update_StateMachine */
+/* USER CODE BEGIN Header_StartDefaultTask */
 /**
- * @brief  Function implementing the State_machine thread.
- * @param  argument: Not used
- * @retval None
- */
-/* USER CODE END Header_Update_StateMachine */
-void Update_StateMachine(void const * argument)
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for (;;)
   {
-    TEST_STATE_MACHINE();
-    osDelay(1);
+	HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin);
+    osDelay(1000);
   }
   /* USER CODE END 5 */
 }
