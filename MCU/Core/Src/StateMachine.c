@@ -8,8 +8,13 @@
 #include "main.h"
 
 #include "StateMachine.h"
+#include "rs232_com.h"
+#include "rs232_418.h"
+
 #include <string.h>
 #include <stdio.h>
+
+#define MAX_PER_LENGTH 7
 
 uint8_t state = 0;
 

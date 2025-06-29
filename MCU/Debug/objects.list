@@ -1,6 +1,8 @@
 "./Core/Src/StateMachine.o"
 "./Core/Src/freertos.o"
 "./Core/Src/main.o"
+"./Core/Src/rs232_418.o"
+"./Core/Src/rs232_com.o"
 "./Core/Src/stm32f1xx_hal_msp.o"
 "./Core/Src/stm32f1xx_hal_timebase_tim.o"
 "./Core/Src/stm32f1xx_it.o"
