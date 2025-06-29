@@ -25,6 +25,8 @@
 
 #include <string.h>
 #include <stdio.h>
+
+#include "StateMachine.h"
 /*
 #include "rs232_com.h"
 #include "rs232_418.h"
@@ -79,6 +81,13 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+
+osThreadId_t StateMachineTaskHandle;
+const osThreadAttr_t StateMachineTask_attributes = {
+	.name = "StateMachineTask",
+	.stack_size = 128*4,
+	.priority = (osPriority_t) osPriorityNormal,
+};
 /* USER CODE BEGIN PV */
 
 
@@ -96,12 +105,12 @@ static void MX_TIM1_Init(void);
 void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
+void StartStateMachineTask(void *argument);
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void send_UART1(const char *msg);
 void send_UART3(const char *msg);
 void start_UART_Reception(void);
-void TEST_STATE_MACHINE(void);
 
 /* USER CODE END PFP */
 
@@ -172,6 +181,7 @@ int main(void)
   /* Create the thread(s) */
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  StateMachineTaskHandle = osThreadNew(StartStateMachineTask, NULL, &StateMachineTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -549,7 +559,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void StartStateMachineTask(void *argument){
+	for(;;){
+		StateMachineTask();
+	}
+}
 
 
 /* USER CODE END 4 */
