@@ -8,8 +8,7 @@
 #include "main.h"
 
 #include "StateMachine.h"
-#include "rs232_com.h"
-#include "rs232_418.h"
+#include "uart.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -17,6 +16,7 @@
 #define MAX_PER_LENGTH 7
 
 uint8_t state = 0;
+char* per_value = 0;
 
 void StateMachineTask(void){
 	static uint8_t action_done = 0;
@@ -55,7 +55,7 @@ void StateMachineTask(void){
 	            if (message_complete1) {
 	                message_complete1 = 0;
 	                TrameDataSTS data = {0};
-	                parse_data_STS(rx_buffer1, &data);
+	                //parse_data_STS(rx_buffer1, &data);
 	                if ((data.acc >= 8.5 && data.acc <= 10) && (data.bat >= 11.5 && data.bat <= 13) && (data.dips[0] == 1 && data.dips[1] == 1 && data.dips[2] == 1 && data.dips[3] == 1 && data.dips[4] == 1 && data.dips[5] == 1 && data.dips[6] == 1 && data.dips[7] == 1)) {
 	                    send_UART3("STS OK --> Etape suivante\n");
 	                    HAL_Delay(500);
@@ -67,7 +67,7 @@ void StateMachineTask(void){
 	            if (message_complete1) {
 	                message_complete1 = 0;
 	                TrameDataSTS data = {0};
-	                parse_data_STS(rx_buffer1, &data);
+	                //parse_data_STS(rx_buffer1, &data);
 	                if (data.inps[0] == 1 && data.inps[1] == 1 && data.inps[2] == 1) {
 	                    send_UART3("Entrees OK --> Etape suivante\n");
 	                    HAL_Delay(500);
@@ -128,7 +128,7 @@ void StateMachineTask(void){
 	            if (!action_done) {
 	                send_UART3("Test STS en cours...\n");
 	                send_UART1("STS\n");
-	                send_UART3(rx_buffer1);
+	                //send_UART3(rx_buffer1);
 	                action_done = 1;
 	            }
 	            break;

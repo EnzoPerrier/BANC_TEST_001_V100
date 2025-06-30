@@ -28,7 +28,7 @@
 
 
 #include "StateMachine.h"
-#include "rs232_com.h"
+#include "uart.h"
 /*
 #include "rs232_com.h"
 #include "rs232_418.h"
@@ -38,20 +38,6 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-/*************************************************** STRUCTURE PARSE TRAME STS
-typedef struct
-{ // Struct Trame de  retour STS
-  char ver[32];
-  char crc[32];
-  char lan[16];
-  float acc;
-  float bat;
-  float cel_val;
-  char cel_mode;
-  char lum;
-  bool dips[8]; // true = ON, false = OFF
-  bool inps[3]; // true = ON, false = OFF (si jamais ça change)
-} TrameDataSTS;*/
 
 /* USER CODE END PTD */
 
