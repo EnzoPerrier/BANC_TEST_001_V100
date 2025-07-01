@@ -11,12 +11,22 @@
 #include <string.h>
 
 //RS232_418
-uint16_t rx_index1 = 0;
+UART_HandleTypeDef huart1;
+
 uint8_t message_complete1 = 0;
+uint8_t rx_char1 = 0;
+uint8_t rx_buffer1[RX_BUFFER1_SIZE] = {0};
+uint16_t rx_index1 = 0;
 
 // RS232_COM
-uint16_t rx_index3 = 0;
+
+UART_HandleTypeDef huart3;
+
 uint8_t message_complete3 = 0;
+uint8_t rx_char3 = 0;
+uint8_t rx_buffer3[RX_BUFFER3_SIZE] = {0};
+uint16_t rx_index3 = 0;
+
 
 
 /**

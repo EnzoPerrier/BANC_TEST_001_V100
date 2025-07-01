@@ -60,7 +60,7 @@ TIM_HandleTypeDef htim1;
 
 
 UART_HandleTypeDef huart2;
-UART_HandleTypeDef huart3;
+
 
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
