@@ -101,7 +101,7 @@ void StateMachineTask(void){
 	            break;
 	        case 1:
 	            if (!action_done) {
-	                send_UART3("Entrez les PER (juste la valeur sur 8 digits)\n");
+	                send_UART3("Entrez le PER (juste la valeur sur 8 digits)\n");
 	                if (message_complete3) {
 	                    message_complete3 = 0;
 	                    if (strlen((char *)rx_buffer3) == MAX_PER_LENGTH) {
@@ -110,7 +110,7 @@ void StateMachineTask(void){
 	                        sprintf(per_command, "PER=%s\n", per_value);
 	                        send_UART1(per_command);
 	                        HAL_Delay(500);
-	                        send_UART1("PER=\n");
+	                        //send_UART1("PER=\n"); // Pour vérifier le PER
 	                    } else {
 	                        send_UART3("Format invalide. Le PER est sur 8 digits, recommencez...\n");
 	                    }
@@ -163,6 +163,7 @@ void StateMachineTask(void){
 	            HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
 	            HAL_Delay(1500);
 	            HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
+	            state ++;
 	            break;
 	        case 7:
 	            send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le BP si la télécommande fonctionne en émission et réception");
