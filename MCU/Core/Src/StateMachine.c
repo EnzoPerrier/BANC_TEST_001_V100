@@ -94,6 +94,7 @@ void StateMachineTask(void){
 	    //--------------------------- ACTIONS
 	    switch (state) {
 	        case 0:
+	        	HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_RESET);
 	            if (!action_done) {
 	                send_UART3("Appuyer sur le bouton pour commencer\n");
 	                action_done = 1;
