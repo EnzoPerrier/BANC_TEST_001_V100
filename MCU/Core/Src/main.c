@@ -507,7 +507,7 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-	HAL_GPIO_TogglePin(LEDG_GPIO_Port, LEDG_Pin); //DEBUG
+	//HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); //DEBUG
     osDelay(1000);
   }
   /* USER CODE END 5 */

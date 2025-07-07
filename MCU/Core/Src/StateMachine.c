@@ -15,6 +15,11 @@
 
 #define MAX_PER_LENGTH 7
 
+/*
+int fputc(int ch, FILE *f){ // DEBUG PRINTF
+	return ITM_SendChar(ch);
+}*/
+
 uint8_t state = 0;
 char* per_value = 0;
 
@@ -77,7 +82,7 @@ void StateMachineTask(void){
 	                    send_UART3("Erreur défaut entrée:");
 	                    for (int i = 0; i < 3; i++) {
 	                        char msg[50];
-	                        sprintf(msg, "Entree num %d : %d\n", i, data.inps[i]);
+	                        sprintf(msg, "Entree num %d : %d\n", i, data.inps[i]); // On affiche l'état des entrées
 	                        send_UART3(msg);
 	                    }
 	                }
@@ -164,7 +169,6 @@ void StateMachineTask(void){
 	            HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
 	            HAL_Delay(1500);
 	            HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
-	            state ++;
 	            break;
 	        case 7:
 	            send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le BP si la télécommande fonctionne en émission et réception");

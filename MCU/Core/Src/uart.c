@@ -109,6 +109,7 @@ void MX_USART3_UART_Init(void)
   huart3.Init.Mode = UART_MODE_TX_RX;
   huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+
   if (HAL_UART_Init(&huart3) != HAL_OK)
   {
     Error_Handler();
@@ -145,6 +146,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	// RS232_418
     if (huart->Instance == USART1)
     {
+    	HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); //DEBUG
         if (rx_char1 != '\n' && rx_index1 < RX_BUFFER1_SIZE - 1)
         {
             rx_buffer1[rx_index1++] = rx_char1;
@@ -161,6 +163,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     //RS232_COM
     if (huart->Instance == USART3)
         {
+    	HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); // DEBUG
             if (rx_char3 != '\n' && rx_index3 < RX_BUFFER3_SIZE - 1)
             {
                 rx_buffer3[rx_index3++] = rx_char3;
@@ -172,6 +175,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
                 rx_index3 = 0;
             }
             HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
+            send_UART3("RECU"); // DEBUG
         }
 }
 

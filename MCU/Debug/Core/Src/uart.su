@@ -3,7 +3,7 @@
 ../Core/Src/uart.c:72:6:send_UART1	16	static
 ../Core/Src/uart.c:77:6:process_UART1_data	4	static
 ../Core/Src/uart.c:94:6:MX_USART3_UART_Init	8	static
-../Core/Src/uart.c:122:6:RS232_COM_Init	8	static
-../Core/Src/uart.c:127:6:send_UART3	16	static
-../Core/Src/uart.c:132:6:process_UART3_data	4	static
-../Core/Src/uart.c:143:6:HAL_UART_RxCpltCallback	16	static
+../Core/Src/uart.c:123:6:RS232_COM_Init	8	static
+../Core/Src/uart.c:128:6:send_UART3	16	static
+../Core/Src/uart.c:133:6:process_UART3_data	4	static
+../Core/Src/uart.c:144:6:HAL_UART_RxCpltCallback	16	static
