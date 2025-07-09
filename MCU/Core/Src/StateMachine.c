@@ -26,6 +26,10 @@ char* per_value = 0;
 void StateMachineTask(void){
 	static uint8_t action_done = 0;
 
+	while(1){
+		send_UART3("HELLO WORLD!");
+	}
+
 	    //--------------------------- TRANSITIONS
 	    switch (state) {
 	        case 0:
