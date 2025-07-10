@@ -27,7 +27,10 @@ void StateMachineTask(void){
 	static uint8_t action_done = 0;
 
 	while(1){
-		send_UART3("HELLO WORLD!");
+		if (HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET) {
+			                send_UART2("HELLO WORLD");
+			                send_UART3("OKKKK");
+			            }
 	}
 
 	    //--------------------------- TRANSITIONS

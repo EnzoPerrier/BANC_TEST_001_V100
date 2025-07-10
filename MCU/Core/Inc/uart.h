@@ -12,6 +12,7 @@
 #include <stdbool.h>
 
 #define RX_BUFFER1_SIZE 100
+#define RX_BUFFER2_SIZE 100
 #define RX_BUFFER3_SIZE 100
 
 
@@ -57,7 +58,19 @@ void MX_USART3_UART_Init(void);
 void RS232_COM_Init(void);
 void send_UART3(const char *msg);
 void process_UART3_data(void);
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+
+//RS485
+extern UART_HandleTypeDef huart2;
+
+extern uint8_t message_complete2;
+extern uint8_t rx_char2;
+extern uint8_t rx_buffer2[RX_BUFFER2_SIZE];
+
+void MX_USART3_UART_Init(void);
+
+void RS485_Init(void);
+void send_UART2(const char *msg);
+void process_UART2_data(void);
 
 
 #endif /* INC_UART_H_ */
