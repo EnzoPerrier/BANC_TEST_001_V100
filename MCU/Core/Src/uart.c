@@ -8,6 +8,11 @@
 #include "uart.h"
 #include "main.h"
 
+#include "stm32f1xx_hal.h"
+#include "stm32f1xx_hal_uart.h"
+#include "stm32f1xx_it.h"
+
+
 #include <string.h>
 
 //RS232_418
@@ -172,14 +177,11 @@ void MX_USART3_UART_Init(void)
 
 
   /* USER CODE BEGIN USART3_Init 2 */
-  //HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
+  HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
   /* USER CODE END USART3_Init 2 */
 
 }
 
-void USART3_IRQHandler(void) {
-    HAL_UART_IRQHandler(&huart3);  // Appel à HAL pour gérer l'interruption
-}
 
 void send_UART3(const char *msg)
 {
@@ -215,6 +217,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             rx_index1 = 0;
         }
         HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
+        send_UART3("418!");
     }
 
     //RS232_COM
@@ -231,7 +234,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
                 rx_index3 = 0;
             }
             HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
-            send_UART3("RECU"); // DEBUG
+            send_UART3("!"); // DEBUG
         }
 
     //RS485

@@ -66,7 +66,7 @@ extern uint8_t message_complete2;
 extern uint8_t rx_char2;
 extern uint8_t rx_buffer2[RX_BUFFER2_SIZE];
 
-void MX_USART3_UART_Init(void);
+void MX_USART2_UART_Init(void);
 
 void RS485_Init(void);
 void send_UART2(const char *msg);

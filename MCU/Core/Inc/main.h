@@ -85,10 +85,6 @@ void Error_Handler(void);
 #define LEDR_GPIO_Port GPIOB
 #define LEDG_Pin GPIO_PIN_2
 #define LEDG_GPIO_Port GPIOB
-#define TX_COM_Pin GPIO_PIN_10
-#define TX_COM_GPIO_Port GPIOB
-#define RX_COM_Pin GPIO_PIN_11
-#define RX_COM_GPIO_Port GPIOB
 #define BP1_IRQ_Pin GPIO_PIN_12
 #define BP1_IRQ_GPIO_Port GPIOB
 #define LEDY_Pin GPIO_PIN_13

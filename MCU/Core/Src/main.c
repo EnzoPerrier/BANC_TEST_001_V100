@@ -58,9 +58,6 @@ I2C_HandleTypeDef hi2c1;
 
 TIM_HandleTypeDef htim1;
 
-
-
-
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
@@ -68,15 +65,13 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-
+/* USER CODE BEGIN PV */
 osThreadId_t StateMachineTaskHandle;
 const osThreadAttr_t StateMachineTask_attributes = {
 	.name = "StateMachineTask",
 	.stack_size = 128*4,
 	.priority = (osPriority_t) osPriorityNormal,
 };
-/* USER CODE BEGIN PV */
-
 
 /* USER CODE END PV */
 
@@ -84,9 +79,6 @@ const osThreadAttr_t StateMachineTask_attributes = {
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
-void MX_USART1_UART_Init(void);
-void MX_USART2_UART_Init(void);
-void MX_USART3_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM1_Init(void);
 void StartDefaultTask(void *argument);
@@ -163,10 +155,10 @@ int main(void)
   /* Create the thread(s) */
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-  StateMachineTaskHandle = osThreadNew(StartStateMachineTask, NULL, &StateMachineTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  StateMachineTaskHandle = osThreadNew(StartStateMachineTask, NULL, &StateMachineTask_attributes);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -180,12 +172,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-  }
   /* USER CODE END 3 */
 }
 
@@ -446,6 +433,7 @@ static void MX_GPIO_Init(void)
 void StartStateMachineTask(void *argument){
 	for(;;){
 		StateMachineTask();
+		osDelay(50);
 	}
 }
 

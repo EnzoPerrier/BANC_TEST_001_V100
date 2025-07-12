@@ -22,7 +22,6 @@ char* per_value = 0;
 void StateMachineTask(void){
 	static uint8_t action_done = 0;
 
-
 	    //--------------------------- TRANSITIONS
 	    switch (state) {
 	        case 0:
@@ -39,7 +38,8 @@ void StateMachineTask(void){
 	            }
 	            break;
 	        case 1:
-	            if (message_complete3) {
+	        	process_UART3_data();
+	            if (message_complete3) {s
 	                message_complete3 = 0;  // Réinitialise le flag pour la prochaine réception
 	                // Vérifie que la longueur du message est correcte (ici 8 caractères pour le PER)
 	                if (strlen((char *)rx_buffer3) == MAX_PER_LENGTH) {
