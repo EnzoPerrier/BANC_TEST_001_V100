@@ -15,10 +15,6 @@
 
 #define MAX_PER_LENGTH 7
 
-/*
-int fputc(int ch, FILE *f){ // DEBUG PRINTF
-	return ITM_SendChar(ch);
-}*/
 
 uint8_t state = 0;
 char* per_value = 0;
@@ -26,12 +22,6 @@ char* per_value = 0;
 void StateMachineTask(void){
 	static uint8_t action_done = 0;
 
-	while(1){
-		if (HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET) {
-			                send_UART2("HELLO WORLD");
-			                send_UART3("OKKKK");
-			            }
-	}
 
 	    //--------------------------- TRANSITIONS
 	    switch (state) {
@@ -49,17 +39,24 @@ void StateMachineTask(void){
 	            }
 	            break;
 	        case 1:
-	            if (message_complete1) {
-	                message_complete1 = 0;
-	                char expected_response[20];
-	                sprintf(expected_response, "PER=%s", per_value);
-	                if (strstr((char *)rx_buffer1, expected_response) == (char *)rx_buffer1) {
-	                    send_UART3("PER VALIDE --> Etape suivante\n");
-	                    HAL_Delay(500);
-	                    state++;
-	                    action_done = 0;
+	            if (message_complete3) {
+	                message_complete3 = 0;  // Réinitialise le flag pour la prochaine réception
+	                // Vérifie que la longueur du message est correcte (ici 8 caractères pour le PER)
+	                if (strlen((char *)rx_buffer3) == MAX_PER_LENGTH) {
+	                    strcpy(per_value, (char *)rx_buffer3);  // Sauvegarde la valeur reçue
+	                    char expected_response[20];
+	                    sprintf(expected_response, "PER=%s", per_value);  // Crée la réponse attendue
+	                    // Vérifie si le début de la chaîne reçue correspond à la réponse attendue
+	                    if (strstr((char *)rx_buffer1, expected_response) == (char *)rx_buffer1) {
+	                        send_UART3("PER VALIDE --> Etape suivante\n");
+	                        HAL_Delay(500);  // Attente pour stabilisation
+	                        state++;  // Passe à l'étape suivante
+	                        action_done = 0;  // Réinitialise l'action pour la prochaine étape
+	                    } else {
+	                        send_UART3("Valeur differente. Entrez a nouveau:\n");
+	                    }
 	                } else {
-	                    send_UART3("Valeur differente. Entrez a nouveau:\n");
+	                    send_UART3("Format invalide. Le PER est sur 8 digits, recommencez...\n");
 	                }
 	            }
 	            break;

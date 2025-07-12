@@ -63,17 +63,13 @@ void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
+  HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
 
   /* USER CODE END USART1_Init 2 */
 
 }
 
 
-
-void RS232_418_Init(void)
-{
-    HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
-}
 
 void send_UART1(const char *msg)
 {
@@ -118,15 +114,12 @@ void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
+  HAL_UART_Receive_IT(&huart2, &rx_char2, 1);
 
   /* USER CODE END USART2_Init 2 */
 
 }
 
-void RS485_Init(void)
-{
-    HAL_UART_Receive_IT(&huart2, &rx_char2, 1);
-}
 
 void send_UART2(const char *msg)
 {
@@ -176,15 +169,16 @@ void MX_USART3_UART_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN USART3_Init 2 */
 
+
+  /* USER CODE BEGIN USART3_Init 2 */
+  //HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
   /* USER CODE END USART3_Init 2 */
 
 }
 
-void RS232_COM_Init(void)
-{
-    HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
+void USART3_IRQHandler(void) {
+    HAL_UART_IRQHandler(&huart3);  // Appel à HAL pour gérer l'interruption
 }
 
 void send_UART3(const char *msg)
@@ -202,13 +196,14 @@ void process_UART3_data(void)
     }
 }
 
+
 // Callback
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); //DEBUG
 	// RS232_418
     if (huart->Instance == USART1)
     {
-    	HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); //DEBUG
         if (rx_char1 != '\n' && rx_index1 < RX_BUFFER1_SIZE - 1)
         {
             rx_buffer1[rx_index1++] = rx_char1;
@@ -225,7 +220,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     //RS232_COM
     if (huart->Instance == USART3)
         {
-    	HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); // DEBUG
             if (rx_char3 != '\n' && rx_index3 < RX_BUFFER3_SIZE - 1)
             {
                 rx_buffer3[rx_index3++] = rx_char3;
@@ -243,7 +237,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     //RS485
         if (huart->Instance == USART2)
             {
-        	HAL_GPIO_WritePin(RTS_485_GPIO_Port, RTS_485_Pin, GPIO_PIN_RESET); // DEBUG
                 if (rx_char2 != '\n' && rx_index2 < RX_BUFFER2_SIZE - 1)
                 {
                     rx_buffer2[rx_index2++] = rx_char2;

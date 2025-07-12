@@ -94,11 +94,6 @@ void StartDefaultTask(void *argument);
 /* USER CODE BEGIN PFP */
 void StartStateMachineTask(void *argument);
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
-void send_UART1(const char *msg);
-void send_UART3(const char *msg);
-void start_UART_Reception(void);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -509,6 +504,7 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+	  send_UART3("ERROR");
   }
   /* USER CODE END Error_Handler_Debug */
 }
