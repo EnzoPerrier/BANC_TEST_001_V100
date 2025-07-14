@@ -29,10 +29,7 @@
 
 #include "StateMachine.h"
 #include "uart.h"
-/*
-#include "rs232_com.h"
-#include "rs232_418.h"
-#include "rs485.h"*/
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,7 +66,7 @@ const osThreadAttr_t defaultTask_attributes = {
 osThreadId_t StateMachineTaskHandle;
 const osThreadAttr_t StateMachineTask_attributes = {
 	.name = "StateMachineTask",
-	.stack_size = 128*4,
+	.stack_size = 256*4,
 	.priority = (osPriority_t) osPriorityNormal,
 };
 

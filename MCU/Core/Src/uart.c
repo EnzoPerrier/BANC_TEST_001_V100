@@ -13,7 +13,8 @@
 #include "stm32f1xx_it.h"
 
 
-#include <string.h>
+#include <string.h> //DEBUG
+#include <stdio.h>
 
 //RS232_418
 UART_HandleTypeDef huart1;
@@ -81,15 +82,7 @@ void send_UART1(const char *msg)
     HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
 }
 
-void process_UART1_data(void)
-{
-    // A appeler dans la machine à états
-    if (message_complete1)
-    {
-        message_complete1 = 0;
-        // Traitement...
-    }
-}
+
 
 /**
   * @brief USART2 Initialization Function
@@ -128,22 +121,9 @@ void MX_USART2_UART_Init(void)
 
 void send_UART2(const char *msg)
 {
-	HAL_GPIO_WritePin(RTS_485_GPIO_Port, RTS_485_Pin, GPIO_PIN_SET); // DEBUG
+	HAL_GPIO_WritePin(RTS_485_GPIO_Port, RTS_485_Pin, GPIO_PIN_SET);
     HAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
 }
-
-void process_UART2_data(void)
-{
-    // A appeler dans la machine à états
-    if (message_complete2)
-    {
-        message_complete2 = 0;
-        // Traitement...
-    }
-}
-
-
-
 
 
 /**
@@ -188,15 +168,7 @@ void send_UART3(const char *msg)
     HAL_UART_Transmit(&huart3, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
 }
 
-void process_UART3_data(void)
-{
-    // A appeler dans la machine à états
-    if (message_complete3)
-    {
-        message_complete3 = 0;
-        // Traitement...
-    }
-}
+
 
 
 // Callback
@@ -206,10 +178,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	// RS232_418
     if (huart->Instance == USART1)
     {
-        if (rx_char1 != '\n' && rx_index1 < RX_BUFFER1_SIZE - 1)
+       if (rx_char1 != '\0' && rx_index1 < RX_BUFFER1_SIZE - 1)
         {
             rx_buffer1[rx_index1++] = rx_char1;
-        }
+            char debugmsg[2] = {rx_char1, '\0'};
+            send_UART3(debugmsg); // DEBUG
+       }
         else
         {
             rx_buffer1[rx_index1] = '\0';
@@ -217,7 +191,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             rx_index1 = 0;
         }
         HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
-        send_UART3("418!");
+        //send_UART3("418!");
     }
 
     //RS232_COM
@@ -230,11 +204,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             else
             {
                 rx_buffer3[rx_index3] = '\0';
-                message_complete3 = 1;
+                message_complete3 = 1; // Flag si message complete = 1 on peut le traiter
                 rx_index3 = 0;
             }
             HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
-            send_UART3("!"); // DEBUG
+            //send_UART3("!"); // DEBUG
         }
 
     //RS485

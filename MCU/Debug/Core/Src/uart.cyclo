@@ -1,10 +1,7 @@
-../Core/Src/uart.c:48:6:MX_USART1_UART_Init	2
-../Core/Src/uart.c:79:6:send_UART1	1
-../Core/Src/uart.c:84:6:process_UART1_data	2
-../Core/Src/uart.c:99:6:MX_USART2_UART_Init	2
-../Core/Src/uart.c:129:6:send_UART2	1
-../Core/Src/uart.c:135:6:process_UART2_data	2
-../Core/Src/uart.c:154:6:MX_USART3_UART_Init	2
-../Core/Src/uart.c:186:6:send_UART3	1
-../Core/Src/uart.c:191:6:process_UART3_data	2
-../Core/Src/uart.c:203:6:HAL_UART_RxCpltCallback	10
+../Core/Src/uart.c:49:6:MX_USART1_UART_Init	2
+../Core/Src/uart.c:80:6:send_UART1	1
+../Core/Src/uart.c:92:6:MX_USART2_UART_Init	2
+../Core/Src/uart.c:122:6:send_UART2	1
+../Core/Src/uart.c:134:6:MX_USART3_UART_Init	2
+../Core/Src/uart.c:166:6:send_UART3	1
+../Core/Src/uart.c:175:6:HAL_UART_RxCpltCallback	10

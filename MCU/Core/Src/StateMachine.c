@@ -6,6 +6,7 @@
  */
 
 #include "main.h"
+#include "cmsis_os.h"
 
 #include "StateMachine.h"
 #include "uart.h"
@@ -13,11 +14,11 @@
 #include <string.h>
 #include <stdio.h>
 
-#define MAX_PER_LENGTH 7
+#define MAX_PER_LENGTH 8
 
 
 uint8_t state = 0;
-char* per_value = 0;
+char* per_value;
 
 void StateMachineTask(void){
 	static uint8_t action_done = 0;
@@ -29,37 +30,48 @@ void StateMachineTask(void){
 	        case 5:
 	        case 6:
 	        case 7:
-	            if (HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET) {
+	            if (!HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin)) {
 	                state++;
 	                action_done = 0;
-	            } else if (HAL_GPIO_ReadPin(BP3_GPIO_Port, BP3_Pin) == GPIO_PIN_RESET && state > 0) {
+	            } else if (!HAL_GPIO_ReadPin(BP3_GPIO_Port, BP3_Pin) && state > 0) {
 	                state--;
 	                action_done = 0;
 	            }
 	            break;
 	        case 1:
-	        	process_UART3_data();
-	            if (message_complete3) {s
-	                message_complete3 = 0;  // Réinitialise le flag pour la prochaine réception
-	                // Vérifie que la longueur du message est correcte (ici 8 caractères pour le PER)
-	                if (strlen((char *)rx_buffer3) == MAX_PER_LENGTH) {
-	                    strcpy(per_value, (char *)rx_buffer3);  // Sauvegarde la valeur reçue
-	                    char expected_response[20];
-	                    sprintf(expected_response, "PER=%s", per_value);  // Crée la réponse attendue
-	                    // Vérifie si le début de la chaîne reçue correspond à la réponse attendue
-	                    if (strstr((char *)rx_buffer1, expected_response) == (char *)rx_buffer1) {
-	                        send_UART3("PER VALIDE --> Etape suivante\n");
-	                        HAL_Delay(500);  // Attente pour stabilisation
-	                        state++;  // Passe à l'étape suivante
-	                        action_done = 0;  // Réinitialise l'action pour la prochaine étape
-	                    } else {
-	                        send_UART3("Valeur differente. Entrez a nouveau:\n");
-	                    }
+	            if (message_complete3) {
+	                message_complete3 = 0;
+	                if (strlen((char*)rx_buffer3) == MAX_PER_LENGTH) {
+	                    strncpy(per_value, (char*)rx_buffer3, MAX_PER_LENGTH);
+	                    per_value[MAX_PER_LENGTH+1] = '\0';
+
+	                    char cmd[20];
+	                    sprintf(cmd, "PER=%s\r", per_value);
+	                    send_UART1(cmd);
+	                    send_UART3("PER envoyé. Attente confirmation…\n");
 	                } else {
-	                    send_UART3("Format invalide. Le PER est sur 8 digits, recommencez...\n");
+	                    send_UART3("Format invalide. Le PER doit faire 8 digits, recommencez…\n");
 	                }
 	            }
+
+	            if (message_complete1) {
+	                message_complete1 = 0;
+
+	                char expected[20];
+	                sprintf(expected, "PER=%s", per_value);
+
+	                if (strncmp((char*)rx_buffer1, expected, strlen(expected)) == 0) {
+	                    send_UART3("PER VALIDE --> Étape suivante\n");
+	                    state++;
+	                    action_done = 0;
+	                } else {
+	                    send_UART3("Valeur différente. Entrez à nouveau le PER :\n");
+	                }
+
+	                rx_buffer1[0] = '\0'; // vide le buffer après réponse
+	            }
 	            break;
+
 	        case 3:
 	            if (message_complete1) {
 	                message_complete1 = 0;
@@ -79,7 +91,7 @@ void StateMachineTask(void){
 	                //parse_data_STS(rx_buffer1, &data);
 	                if (data.inps[0] == 1 && data.inps[1] == 1 && data.inps[2] == 1) {
 	                    send_UART3("Entrees OK --> Etape suivante\n");
-	                    HAL_Delay(500);
+	                    osDelay(500);
 	                    state++;
 	                    action_done = 0;
 	                } else {
@@ -105,37 +117,41 @@ void StateMachineTask(void){
 	        case 0:
 	        	HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_RESET);
 	            if (!action_done) {
+	            	send_UART3("ETAPE 0\n");
+	            	osDelay(10);
 	                send_UART3("Appuyer sur le bouton pour commencer\n");
 	                action_done = 1;
 	            }
 	            break;
 	        case 1:
-	            if (!action_done) {
-	                send_UART3("Entrez le PER (juste la valeur sur 8 digits)\n");
-	                if (message_complete3) {
-	                    message_complete3 = 0;
-	                    if (strlen((char *)rx_buffer3) == MAX_PER_LENGTH) {
-	                        strcpy(per_value, (char *)rx_buffer3);
-	                        char per_command[20];
-	                        sprintf(per_command, "PER=%s\n", per_value);
-	                        send_UART1(per_command);
-	                        HAL_Delay(500);
-	                        //send_UART1("PER=\n"); // Pour vérifier le PER
-	                    } else {
-	                        send_UART3("Format invalide. Le PER est sur 8 digits, recommencez...\n");
-	                    }
-	                }
-	                action_done = 1;
-	            }
-	            break;
+	        if (!action_done) {
+	        send_UART3("Entrez le PER (juste la valeur sur 8 digits)\n");
+	        if (message_complete3) {
+	        message_complete3 = 0;
+	        if (strlen((char *)rx_buffer3) == MAX_PER_LENGTH) {
+	        strcpy(per_value, (char *)rx_buffer3);
+	        char per_command[20];
+	        sprintf(per_command, "PER=%s\r", per_value);
+	        send_UART1(per_command);
+	        osDelay(500);
+	        } else {
+	        send_UART3("Format invalide. Le PER est sur 8 digits, recommencez...\n");
+	        }
+	        }
+	        action_done = 1;
+	        }
+	        break;
+
 	        case 2:
 	            if (!action_done) {
+	            	send_UART3("ETAPE 2\n");
 	                send_UART3("Mettez tous les DIPs sur ON, une fois fait appuyez sur le bouton\n");
 	                action_done = 1;
 	            }
 	            break;
 	        case 3:
 	            if (!action_done) {
+	            	send_UART3("ETAPE 3\n");
 	                send_UART3("Test STS en cours...\n");
 	                send_UART1("STS\n");
 	                //send_UART3(rx_buffer1);
@@ -144,22 +160,23 @@ void StateMachineTask(void){
 	            break;
 	        case 4:
 	            if (!action_done) {
+	            	send_UART3("ETAPE 4\n");
 	                send_UART3("Test entrees en cours...\n");
 	                // Activation de toutes les entrées
 	                HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
 	                HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
 	                HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
 	                HAL_Delay(300);
-	                send_UART1("STS\n");
+	                send_UART1("STS\r");
 	                action_done = 1;
 	            }
 	            break;
 	        case 5:
 	            send_UART3("Test du décompteur...\n Veuillez valider en appuyant sur le BP si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur");
-	            send_UART1("TST=1\n");
+	            send_UART1("TST=1\r");
 	            break;
 	        case 6:
-	            send_UART1("TST=0");
+	            send_UART1("TST=0\r");
 	            HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
 	            HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_RESET);
 	            HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_RESET);

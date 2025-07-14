@@ -25,9 +25,8 @@ extern uint8_t rx_buffer1[RX_BUFFER1_SIZE];
 
 void MX_USART1_UART_Init(void);
 
-void RS232_418_Init(void);
+
 void send_UART1(const char *msg);
-void process_UART1_data(void);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 
 //---------------------------------- STRUCTURE PARSE TRAME STS
@@ -55,9 +54,8 @@ extern uint8_t rx_buffer3[RX_BUFFER3_SIZE];
 
 void MX_USART3_UART_Init(void);
 
-void RS232_COM_Init(void);
 void send_UART3(const char *msg);
-void process_UART3_data(void);
+
 
 //RS485
 extern UART_HandleTypeDef huart2;
@@ -67,10 +65,6 @@ extern uint8_t rx_char2;
 extern uint8_t rx_buffer2[RX_BUFFER2_SIZE];
 
 void MX_USART2_UART_Init(void);
-
-void RS485_Init(void);
 void send_UART2(const char *msg);
-void process_UART2_data(void);
-
 
 #endif /* INC_UART_H_ */
