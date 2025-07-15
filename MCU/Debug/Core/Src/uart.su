@@ -4,4 +4,4 @@
 ../Core/Src/uart.c:122:6:send_UART2	16	static
 ../Core/Src/uart.c:134:6:MX_USART3_UART_Init	8	static
 ../Core/Src/uart.c:166:6:send_UART3	16	static
-../Core/Src/uart.c:175:6:HAL_UART_RxCpltCallback	24	static
+../Core/Src/uart.c:175:6:HAL_UART_RxCpltCallback	16	static

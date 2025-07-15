@@ -174,59 +174,60 @@ void send_UART3(const char *msg)
 // Callback
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); //DEBUG
-	// RS232_418
+    HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); // DEBUG
+
+    // RS232_418
     if (huart->Instance == USART1)
     {
-       if (rx_char1 != '\0' && rx_index1 < RX_BUFFER1_SIZE - 1)
+        if (rx_char1 != '\0' && rx_index1 < RX_BUFFER1_SIZE - 1)
         {
             rx_buffer1[rx_index1++] = rx_char1;
-            char debugmsg[2] = {rx_char1, '\0'};
-            send_UART3(debugmsg); // DEBUG
-       }
+        }
         else
         {
+
             rx_buffer1[rx_index1] = '\0';
             message_complete1 = 1;
             rx_index1 = 0;
+            send_UART3((char*)rx_buffer1);
         }
         HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
-        //send_UART3("418!");
+        // send_UART3("418!"); // DEBUG
     }
 
-    //RS232_COM
+    // RS232_COM
     if (huart->Instance == USART3)
+    {
+        if (rx_char3 != '\r' && rx_index3 < RX_BUFFER3_SIZE - 1)
         {
-            if (rx_char3 != '\n' && rx_index3 < RX_BUFFER3_SIZE - 1)
-            {
-                rx_buffer3[rx_index3++] = rx_char3;
-            }
-            else
-            {
-                rx_buffer3[rx_index3] = '\0';
-                message_complete3 = 1; // Flag si message complete = 1 on peut le traiter
-                rx_index3 = 0;
-            }
-            HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
-            //send_UART3("!"); // DEBUG
+            rx_buffer3[rx_index3++] = rx_char3;
         }
+        else
+        {
+            rx_buffer3[rx_index3] = '\r';
+            message_complete3 = 1;
+            rx_index3 = 0;
+        }
+        HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
+        // send_UART3("!"); // DEBUG
+    }
 
-    //RS485
-        if (huart->Instance == USART2)
-            {
-                if (rx_char2 != '\n' && rx_index2 < RX_BUFFER2_SIZE - 1)
-                {
-                    rx_buffer2[rx_index2++] = rx_char2;
-                }
-                else
-                {
-                    rx_buffer2[rx_index2] = '\0';
-                    message_complete2 = 1;
-                    rx_index2 = 0;
-                }
-                HAL_UART_Receive_IT(&huart2, &rx_char2, 1);
-            }
+    // RS485
+    if (huart->Instance == USART2)
+    {
+        if (rx_char2 != '\0' && rx_index2 < RX_BUFFER2_SIZE - 1)
+        {
+            rx_buffer2[rx_index2++] = rx_char2;
+        }
+        else
+        {
 
+             rx_buffer2[rx_index2] = '\0';
+             message_complete2 = 1;
+             rx_index2 = 0;
+        }
+        HAL_UART_Receive_IT(&huart2, &rx_char2, 1);
+    }
 }
 
 
