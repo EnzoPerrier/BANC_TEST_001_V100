@@ -18,7 +18,7 @@
 
 
 uint8_t state = 0;
-char per_value[MAX_PER_LENGTH];
+char per_value[MAX_PER_LENGTH+1];
 
 void StateMachineTask(void){
     static uint8_t action_done = 0;
@@ -26,7 +26,6 @@ void StateMachineTask(void){
     //--------------------------- TRANSITIONS
     switch (state) {
         case 0:
-        case 2:
         case 5:
         case 6:
         case 7:
@@ -39,56 +38,36 @@ void StateMachineTask(void){
             }
             break;
         case 1:
-            if (message_complete3) {
-                message_complete3 = 0;
-                // Nettoyer la chaîne des caractères \r et \n
-                    char cleaned_buffer[20];
-                    int i = 0;
-                    // Copier les caractères sauf \r et \n
-                    for (int j = 0; j < strlen((char*)rx_buffer3); j++) {
-                        if (rx_buffer3[j] != '\r' && rx_buffer3[j] != '\n') {
-                            cleaned_buffer[i++] = rx_buffer3[j];
-                        }
-                    }
-                    cleaned_buffer[i] = '\0';  // Terminer la chaîne propre
-
-                    // Vérifier la longueur après nettoyage
-                    if (strlen(cleaned_buffer) == MAX_PER_LENGTH) {
-                        strncpy(per_value, cleaned_buffer, MAX_PER_LENGTH);
-                        char cmd[20];
-                        sprintf(cmd, "PER=%s\r", per_value);
-                        send_UART3(cmd); //DEBUG
-                        osDelay(50);
-                        send_UART1(cmd);
-                        send_UART3("PER envoyé. Attente confirmation…\n");
-                        osDelay(500);
-                        rx_buffer1[0] = '\0';
-                        osDelay(50);
-                        send_UART1("PER\r");
-                    } else {
-                    send_UART3("Format invalide. Le PER doit faire 8 digits, recommencez…\n");
-                }
-            }
+            Check_UART1_Timeout(); // Permer de vérifier si on a fini de recevoir le message et retoure message_complete1
 
             if (message_complete1) {
                 message_complete1 = 0;
 
-                send_UART3((char*)rx_buffer1); //DEBUG
+                char expected[20];
+                sprintf(expected, "PER = %s", per_value);
 
-                char expected[100];
-                sprintf(expected, "PER=%s\r\n", per_value);
-
-                if (strncmp((char*)rx_buffer1, expected, strlen(expected)) == 0) {
+                if (strstr((char*)rx_buffer1, expected) != NULL) {
                     send_UART3("PER VALIDE --> Étape suivante\n");
+                    //memset(rx_buffer1, 0, RX_BUFFER1_SIZE ); // On reset notre buffer par sécurité
                     state++;
                     action_done = 0;
                 } else {
                     send_UART3("Valeur différente. Entrez à nouveau le PER :\n");
                 }
-
-                rx_buffer1[0] = '\0'; // vide le buffer après réponse
             }
             break;
+
+
+        case 2:
+        	Check_UART1_Timeout(); // Permer de vérifier si on a fini de recevoir le message et retoure message_complete1
+
+        	if(message_complete1){
+        		message_complete1 = 0;
+
+        		send_UART3((char*)rx_buffer1); //DEBUG
+
+        	}
+        	break;
 
         case 3:
             if (message_complete1) {
@@ -150,20 +129,50 @@ void StateMachineTask(void){
                 send_UART3("Entrez le PER (juste la valeur sur 8 digits)\n");
                 action_done = 1;
             }
+
+            if (message_complete3) {
+                            message_complete3 = 0;
+                            // Nettoyer la chaîne des caractères \r et \n
+                                char cleaned_buffer[20];
+                                int i = 0;
+                                // Copier les caractères sauf \r et \n
+                                for (int j = 0; j < strlen((char*)rx_buffer3); j++) {
+                                    if (rx_buffer3[j] != '\r' && rx_buffer3[j] != '\n') {
+                                        cleaned_buffer[i++] = rx_buffer3[j];
+                                    }
+                                }
+                                cleaned_buffer[i] = '\0';  // Terminer la chaîne propre
+
+                                // Vérifier la longueur après nettoyage
+                                if (strlen(cleaned_buffer) == MAX_PER_LENGTH) {
+                                    strncpy(per_value, cleaned_buffer, MAX_PER_LENGTH);
+
+                                    char cmd[30];
+                                    sprintf(cmd, "PER=%s\r", per_value);
+                                    send_UART1(cmd);
+                                    osDelay(10);
+                                    send_UART1(cmd);
+                                    send_UART3("PER envoyé. Attente confirmation…\n");
+                                    osDelay(1000);
+                                    send_UART1("PER\r");
+                                    osDelay(50);
+                                } else {
+                                send_UART3("Format invalide. Le PER doit faire 8 digits, recommencez…\n");
+                            }
+                        }
             break;
 
         case 2:
             if (!action_done) {
                 send_UART3("ETAPE 2\n");
                 send_UART3("Mettez tous les DIPs sur ON, une fois fait appuyez sur le bouton\n");
+                send_UART1("STS\r");
                 action_done = 1;
             }
             break;
         case 3:
             if (!action_done) {
-                send_UART3("ETAPE 3\n");
                 send_UART3("Test STS en cours...\n");
-                send_UART1("STS\n");
                 action_done = 1;
             }
             break;
@@ -211,4 +220,6 @@ void StateMachineTask(void){
             break;
     }
 }
+
+
 

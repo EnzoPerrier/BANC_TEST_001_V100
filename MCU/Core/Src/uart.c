@@ -16,6 +16,8 @@
 #include <string.h> //DEBUG
 #include <stdio.h>
 
+#define RX_TIMEOUT_MS 200  // 200 ms timeout
+
 //RS232_418
 UART_HandleTypeDef huart1;
 
@@ -23,6 +25,8 @@ uint8_t message_complete1 = 0;
 uint8_t rx_char1 = 0;
 uint8_t rx_buffer1[RX_BUFFER1_SIZE] = {0};
 uint16_t rx_index1 = 0;
+
+volatile uint32_t last_rx_tick1 = 0;
 
 // RS232_COM
 UART_HandleTypeDef huart3;
@@ -82,6 +86,10 @@ void send_UART1(const char *msg)
     HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
 }
 
+void clear_rx_buffer1(void){
+	memset(rx_buffer1, 0, sizeof(rx_buffer1));
+}
+
 
 
 /**
@@ -123,6 +131,10 @@ void send_UART2(const char *msg)
 {
 	HAL_GPIO_WritePin(RTS_485_GPIO_Port, RTS_485_Pin, GPIO_PIN_SET);
     HAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
+}
+
+void clear_rx_buffer2(void){
+	memset(rx_buffer2, 0, sizeof(rx_buffer2));
 }
 
 
@@ -168,7 +180,9 @@ void send_UART3(const char *msg)
     HAL_UART_Transmit(&huart3, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
 }
 
-
+void clear_rx_buffer3(void){
+	memset(rx_buffer3, 0, sizeof(rx_buffer3));
+}
 
 
 // Callback
@@ -178,22 +192,23 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     // RS232_418
     if (huart->Instance == USART1)
-    {
-        if (rx_char1 != '\0' && rx_index1 < RX_BUFFER1_SIZE - 1)
         {
-            rx_buffer1[rx_index1++] = rx_char1;
-        }
-        else
-        {
+            // Stocker le tick de réception à chaque char reçu
+            last_rx_tick1 = HAL_GetTick();
 
-            rx_buffer1[rx_index1] = '\0';
-            message_complete1 = 1;
-            rx_index1 = 0;
-            send_UART3((char*)rx_buffer1);
+            if (rx_char1 != '\0' && rx_index1 < RX_BUFFER1_SIZE - 1)
+            {
+                rx_buffer1[rx_index1++] = rx_char1;
+            }
+            else
+            {
+                rx_buffer1[rx_index1] = '\0';
+                message_complete1 = 1;
+                rx_index1 = 0;
+            }
+
+            HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
         }
-        HAL_UART_Receive_IT(&huart1, &rx_char1, 1);
-        // send_UART3("418!"); // DEBUG
-    }
 
     // RS232_COM
     if (huart->Instance == USART3)
@@ -209,7 +224,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             rx_index3 = 0;
         }
         HAL_UART_Receive_IT(&huart3, &rx_char3, 1);
-        // send_UART3("!"); // DEBUG
+        //send_UART3("COM!"); // DEBUG
     }
 
     // RS485
@@ -229,6 +244,19 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         HAL_UART_Receive_IT(&huart2, &rx_char2, 1);
     }
 }
+
+void Check_UART1_Timeout(void){
+    if (!message_complete1 && rx_index1 > 0)
+    {
+        if ((HAL_GetTick() - last_rx_tick1) > RX_TIMEOUT_MS)
+        {
+            rx_buffer1[rx_index1] = '\0';
+            message_complete1 = 1;
+            rx_index1 = 0;
+        }
+    }
+}
+
 
 
 
