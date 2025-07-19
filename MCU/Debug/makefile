@@ -65,7 +65,7 @@ main-build: MCU.elf secondary-outputs
 
 # Tool invocations
 MCU.elf MCU.map: $(OBJS) $(USER_OBJS) Y:\Projets\Projet\ 11\ Banc\ de\ test\ EL418\ -\ TTS\soft\BANC_TEST_001_V100\MCU\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "MCU.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"Y:\Projets\Projet 11 Banc de test EL418 - TTS\soft\BANC_TEST_001_V100\MCU\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MCU.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "MCU.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"Y:\Projets\Projet 11 Banc de test EL418 - TTS\soft\BANC_TEST_001_V100\MCU\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MCU.map" -Wl,--gc-sections -static -u _scanf_float --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -1,1 +1,2 @@
-../Core/Src/StateMachine.c:23:6:StateMachineTask	256	static
+../Core/Src/StateMachine.c:45:6:StateMachineTask	272	static
+../Core/Src/StateMachine.c:351:6:parse_data_STS	56	static
