@@ -26,7 +26,6 @@
 #include <string.h>
 #include <stdio.h>
 
-
 #include "StateMachine.h"
 #include "uart.h"
 
@@ -34,7 +33,6 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
 
 /* USER CODE END PTD */
 
@@ -58,16 +56,16 @@ TIM_HandleTypeDef htim1;
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "defaultTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
 osThreadId_t StateMachineTaskHandle;
 const osThreadAttr_t StateMachineTask_attributes = {
-	.name = "StateMachineTask",
-	.stack_size = 256*4,
-	.priority = (osPriority_t) osPriorityNormal,
+    .name = "StateMachineTask",
+    .stack_size = 512 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 
 /* USER CODE END PV */
@@ -91,9 +89,9 @@ void StartStateMachineTask(void *argument);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
 
@@ -126,7 +124,6 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-
 
   /* USER CODE END 2 */
 
@@ -174,9 +171,9 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -184,8 +181,8 @@ void SystemClock_Config(void)
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
@@ -199,9 +196,8 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -220,10 +216,10 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief ADC1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief ADC1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_ADC1_Init(void)
 {
 
@@ -238,7 +234,7 @@ static void MX_ADC1_Init(void)
   /* USER CODE END ADC1_Init 1 */
 
   /** Common config
-  */
+   */
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
@@ -252,7 +248,7 @@ static void MX_ADC1_Init(void)
   }
 
   /** Configure Regular Channel
-  */
+   */
   sConfig.Channel = ADC_CHANNEL_8;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
@@ -263,14 +259,13 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
-
 }
 
 /**
-  * @brief I2C1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief I2C1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_I2C1_Init(void)
 {
 
@@ -297,14 +292,13 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
-
 }
 
 /**
-  * @brief TIM1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_TIM1_Init(void)
 {
 
@@ -343,15 +337,13 @@ static void MX_TIM1_Init(void)
   /* USER CODE BEGIN TIM1_Init 2 */
 
   /* USER CODE END TIM1_Init 2 */
-
 }
 
-
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -366,18 +358,16 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, OUT8_Pin|BUZZER_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, OUT8_Pin | BUZZER_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, RTS_485_Pin|LED_CEL_Pin|OUT2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, RTS_485_Pin | LED_CEL_Pin | OUT2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LEDR_Pin|LEDG_Pin|LEDY_Pin|RELAIS_ALIM_418_Pin
-                          |OUT1_Pin|OUT3_Pin|OUT4_Pin|OUT5_Pin
-                          |OUT6_Pin|OUT7_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LEDR_Pin | LEDG_Pin | LEDY_Pin | RELAIS_ALIM_418_Pin | OUT1_Pin | OUT3_Pin | OUT4_Pin | OUT5_Pin | OUT6_Pin | OUT7_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : OUT8_Pin BUZZER_Pin */
-  GPIO_InitStruct.Pin = OUT8_Pin|BUZZER_Pin;
+  GPIO_InitStruct.Pin = OUT8_Pin | BUZZER_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -391,14 +381,13 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : DIP2_Pin DIP3_Pin BP2_Pin BP3_Pin
                            BP4_Pin */
-  GPIO_InitStruct.Pin = DIP2_Pin|DIP3_Pin|BP2_Pin|BP3_Pin
-                          |BP4_Pin;
+  GPIO_InitStruct.Pin = DIP2_Pin | DIP3_Pin | BP2_Pin | BP3_Pin | BP4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RTS_485_Pin LED_CEL_Pin OUT2_Pin */
-  GPIO_InitStruct.Pin = RTS_485_Pin|LED_CEL_Pin|OUT2_Pin;
+  GPIO_InitStruct.Pin = RTS_485_Pin | LED_CEL_Pin | OUT2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -407,9 +396,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : LEDR_Pin LEDG_Pin LEDY_Pin RELAIS_ALIM_418_Pin
                            OUT1_Pin OUT3_Pin OUT4_Pin OUT5_Pin
                            OUT6_Pin OUT7_Pin */
-  GPIO_InitStruct.Pin = LEDR_Pin|LEDG_Pin|LEDY_Pin|RELAIS_ALIM_418_Pin
-                          |OUT1_Pin|OUT3_Pin|OUT4_Pin|OUT5_Pin
-                          |OUT6_Pin|OUT7_Pin;
+  GPIO_InitStruct.Pin = LEDR_Pin | LEDG_Pin | LEDY_Pin | RELAIS_ALIM_418_Pin | OUT1_Pin | OUT3_Pin | OUT4_Pin | OUT5_Pin | OUT6_Pin | OUT7_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -427,22 +414,23 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void StartStateMachineTask(void *argument){
-	for(;;){
-		StateMachineTask();
-		osDelay(50);
-	}
+void StartStateMachineTask(void *argument)
+{
+  for (;;)
+  {
+    StateMachineTask();
+    osDelay(50);
+  }
 }
-
 
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
+ * @brief  Function implementing the defaultTask thread.
+ * @param  argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
@@ -450,20 +438,20 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-	//HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); //DEBUG
+    // HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); //DEBUG
     osDelay(1000);
   }
   /* USER CODE END 5 */
 }
 
 /**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM2 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
+ * @brief  Period elapsed callback in non blocking mode
+ * @note   This function is called  when TIM2 interrupt took place, inside
+ * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+ * a global variable "uwTick" used as application time base.
+ * @param  htim : TIM handle
+ * @retval None
+ */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
@@ -479,9 +467,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 }
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -489,19 +477,19 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-	  send_UART3("ERROR");
+    send_UART3("ERROR");
   }
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
