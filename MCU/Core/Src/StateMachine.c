@@ -53,9 +53,19 @@ void StateMachineTask(void)
     {
     case 0:
     case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
         if (!HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin))
         {
-            state++;
+        	if(state < 10){
+        		state++;
+        	}
+        	else{
+        		state = 0;
+        	}
+
             action_done = 0;
         }
         else if (!HAL_GPIO_ReadPin(BP3_GPIO_Port, BP3_Pin) && state > 0)
@@ -247,13 +257,15 @@ void StateMachineTask(void)
         }
         break;
 
-    case 6:
+    case 6: // Test entrées à ON
         Check_UART1_Timeout();
         if (message_complete1)
         {
             message_complete1 = 0;
+
             bool inps_ok = true;
-            send_UART3((char *)rx_buffer1);
+
+            send_UART3((char *)rx_buffer1); //DEBUG
             TrameDataSTS data = {0};
             parse_data_STS((char *)rx_buffer1, &data);
 
@@ -279,13 +291,7 @@ void StateMachineTask(void)
         }
         break;
 
-    case 8:
-        if (HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin) == GPIO_PIN_RESET)
-        {
-            state = 0;
-            action_done = 0;
-        }
-        break;
+
     }
 
     //--------------------------- ACTIONS
@@ -377,7 +383,7 @@ void StateMachineTask(void)
     case 4:
         if (!action_done)
         {
-            send_UART3("Mettez les DIPs à ON et appuyez sur le bouton\n");
+            send_UART3("Mettez les DIPs à ON, appuyez sur le BP reset et appuyez sur le bouton\n");
             osDelay(500);
             action_done = 1;
         }
@@ -403,7 +409,7 @@ void StateMachineTask(void)
         }
         break;
 
-    case 6: // Entrées à OFF
+    case 6: // Entrées à ON
         if (!action_done)
         {
             send_UART3("Test entrees à ON en cours...\n");
@@ -417,31 +423,60 @@ void StateMachineTask(void)
         }
         break;
     case 7:
-        send_UART3("Test du décompteur...\n Veuillez valider en appuyant sur le BP si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur");
-        send_UART1("TST=1\r");
+    	if (!action_done)
+    	        {
+    		        // On réinitialise les entrées précédemment sur ON
+    		    	HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
+    		    	HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
+    		    	HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
+    		        send_UART3("Test du décompteur...\n Veuillez valider en appuyant sur le BP si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur");
+    		        send_UART1("TST=1\r");
+    		        action_done = 1;
+    	        }
+    	        break;
+    case 8: // Défauts ampoules
+    	if (!action_done)
+    	{
+    		send_UART1("TST=0\r"); // On arrête le test décompteur
+    		send_UART3("Test des ampoules ...\n\r Vérifiez que les ampoules s'éteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien à la bonne ampoule\n\rEnsuite appuyez sur le bouton pour valider");
+    		action_done = 1;
+    	}
+    	HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
+    	osDelay(2000);
+    	HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
+    	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
+    	osDelay(2000);
+    	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
+    	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
+    	osDelay(2000);
+    	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
+    	break;
+    case 9: // Test cellule
+    	// on remet les relais à l'état initial
+    	HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
+    	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
+    	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
+    	if(!action_done){
+
+    	send_UART3("Test cellule, veuillez exposé la cellule à la lumière, puis reset la carte en cachant la cellule et constatez que la luminosité est bien différente");
+    	action_done = 1;
+    	}
+    	 break;
+
+
+    case 10:// Test IR
+    	if(!action_done){
+
+    	send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le BP si la télécommande fonctionne en émission et réception");
+    	action_done = 1;
+    	}
         break;
-    case 8:
-        send_UART1("TST=0\r");
-        HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
-        send_UART3("Test des ampoules ...\n Vérifiez que les ampoules s'éteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien à la bonne ampoule");
-        HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
-        osDelay(2000);
-        HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
-        osDelay(2000);
-        HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
-        osDelay(2000);
-        HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
-        break;
-    case 9:
-        send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le BP si la télécommande fonctionne en émission et réception");
-        break;
-    case 10:
+    case 11:
+    	if(!action_done){
         HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_SET);
         send_UART3("Test de l'accu...\n Veuillez vérifier que vous avez bien le message suppression batterie qui s'affiche à l'écran, si le cas validez");
+    	action_done=1;
+    	}
         break;
     default:
         break;
@@ -450,82 +485,165 @@ void StateMachineTask(void)
 
 //---------------------------------------------------------------- Fonctions outils
 void parse_data_STS(char *buffer, TrameDataSTS *data)
+
 {
+
     char *line = strtok(buffer, "\r\n");
+
+
+
+    bool cel_val_parsed = false;
+
+    bool cel_mode_parsed = false;
+
+
+
     while (line != NULL)
+
     {
 
         if (strncmp(line, "VER =", 5) == 0)
+
         {
+
             sscanf(line, "VER = %31[^\r\n]", data->ver);
-        }
-        else if (strncmp(line, "CRC =", 5) == 0)
-        {
-            sscanf(line, "CRC = %63[^\r\n]", data->crc);
-        }
-        else if (strncmp(line, "LAN =", 5) == 0)
-        {
-            sscanf(line, "LAN = %15[^\r\n]", data->lan);
-        }
-        else if (strncmp(line, "ACC =", 5) == 0)
-        {
-            sscanf(line, "ACC = %f", &data->acc);
-        }
-        else if (strncmp(line, "BAT =", 5) == 0)
-        {
-            sscanf(line, "BAT = %f", &data->bat);
-        }
-        else if (strncmp(line, "CEL =", 5) == 0 && strchr(line, 'v'))
-        {
-            sscanf(line, "CEL = %f", &data->cel_val);
-        }
-        else if (strncmp(line, "CEL =", 5) == 0 && !strchr(line, 'v'))
-        {
-            sscanf(line, "CEL = %c", &data->cel_mode);
-        }
-        else if (strncmp(line, "LUM =", 5) == 0)
-        {
-            sscanf(line, "LUM = %c", &data->lum);
-        }
-        else if (strncmp(line, "DIP =", 5) == 0)
-        {
-            int index = 0;
-            char *token = strtok(line + 5, " ");
-            while (token != NULL && index < 8)
-            {
-                int num;
-                char state[4];
-                if (sscanf(token, "%d:%3s", &num, state) == 2)
-                {
-                    if (num >= 1 && num <= 8)
-                    {
-                        data->dips[num - 1] = (strcmp(state, "ON") == 0);
-                    }
-                }
-                index++;
-                token = strtok(NULL, " ");
-            }
-        }
-        else if (strncmp(line, "INP =", 5) == 0)
-        {
-            int index = 0;
-            char *token = strtok(line + 5, " ");
-            while (token != NULL && index < 3)
-            {
-                int num;
-                char state[4];
-                if (sscanf(token, "%d:%3s", &num, state) == 2)
-                {
-                    if (num >= 1 && num <= 3)
-                    {
-                        data->inps[num - 1] = (strcmp(state, "ON") == 0);
-                    }
-                }
-                index++;
-                token = strtok(NULL, " ");
-            }
+
         }
 
+        else if (strncmp(line, "CRC =", 5) == 0)
+
+        {
+
+            sscanf(line, "CRC = %63[^\r\n]", data->crc);
+
+        }
+
+        else if (strncmp(line, "LAN =", 5) == 0)
+
+        {
+
+            sscanf(line, "LAN = %15[^\r\n]", data->lan);
+
+        }
+
+        else if (strncmp(line, "ACC =", 5) == 0)
+
+        {
+
+            sscanf(line, "ACC = %f", &data->acc);
+
+        }
+
+        else if (strncmp(line, "BAT =", 5) == 0)
+
+        {
+
+            sscanf(line, "BAT = %f", &data->bat);
+
+        }
+
+        else if (strncmp(line, "CEL =", 5) == 0)
+
+        {
+
+            // Essaye de parser float si pas encore fait
+
+            if (!cel_val_parsed && sscanf(line, "CEL = %f", &data->cel_val) == 1)
+
+            {
+
+                cel_val_parsed = true;
+
+            }
+
+            // Sinon essaye de parser mode char, indépendamment
+
+            else if (!cel_mode_parsed && sscanf(line, "CEL = %c", &data->cel_mode) == 1)
+
+            {
+
+                cel_mode_parsed = true;
+
+            }
+
+        }
+
+        else if (strncmp(line, "LUM =", 5) == 0)
+
+        {
+
+            sscanf(line, "LUM = %c", &data->lum);
+
+        }
+
+        else if (strncmp(line, "DIP =", 5) == 0)
+
+        {
+
+            char *p = line + 5;
+
+            int num;
+
+            char state[4];
+
+
+
+            while (sscanf(p, " %d:%3s", &num, state) == 2)
+
+            {
+
+                if (num >= 1 && num <= 8)
+
+                    data->dips[num - 1] = (strcmp(state, "ON") == 0);
+
+
+
+                char *next = strchr(p, ' ');
+
+                if (!next) break;
+
+                p = next + 1;
+
+            }
+
+        }
+
+        else if (strncmp(line, "INP =", 5) == 0)
+
+        {
+
+            char *p = line + 5;
+
+            int num;
+
+            char state[4];
+
+
+
+            while (sscanf(p, " %d:%3s", &num, state) == 2)
+
+            {
+
+                if (num >= 1 && num <= 3)
+
+                    data->inps[num - 1] = (strcmp(state, "ON") == 0);
+
+
+
+                char *next = strchr(p, ' ');
+
+                if (!next) break;
+
+                p = next + 1;
+
+            }
+
+        }
+
+
+
         line = strtok(NULL, "\r\n");
+
     }
+
 }
