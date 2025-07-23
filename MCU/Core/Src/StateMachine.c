@@ -54,12 +54,11 @@ void StateMachineTask(void)
     case 0:
     case 7:
     case 8:
-    case 9:
-    case 10:
     case 11:
+    case 12:
         if (!HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin))
         {
-        	if(state < 10){
+        	if(state < 12){
         		state++;
         	}
         	else{
@@ -86,14 +85,14 @@ void StateMachineTask(void)
 
             if (strstr((char *)rx_buffer1, expected) != NULL)
             {
-                send_UART3("PER VALIDE --> Étape suivante\n");
+                send_UART3("PER VALIDE --> Etape suivante\r\n");
                 // memset(rx_buffer1, 0, RX_BUFFER1_SIZE ); // On reset notre buffer par sécurité
                 state++;
                 action_done = 0;
             }
             else
             {
-                send_UART3("Valeur différente. Entrez à nouveau le PER :\n");
+                send_UART3("Valeur differente. Entrez a nouveau le PER :\r\n");
             }
         }
         break;
@@ -118,31 +117,31 @@ void StateMachineTask(void)
             }
             else
             {
-                send_UART3("Accu NOK : Valeur hors plage !!\n");
+                send_UART3("Accu NOK : Valeur hors plage !!\r\n");
             }
 
             // Vérification BAT
             if (data.bat >= 11.5 && data.bat <= 13.0)
             {
-                send_UART3("Tension batterie OK\n");
+                send_UART3("Tension batterie OK\r\n");
                 bat_ok = true;
             }
             else
             {
-                send_UART3("Tension batterie NOK : Valeur hors plage !!\n");
+                send_UART3("Tension batterie NOK : Valeur hors plage !!\r\n");
             }
 
             // Transition si tout est bon
             if (/*acc_ok && */ bat_ok)
             {
-                send_UART3("STS OK --> Etape suivante\n");
+                send_UART3("STS OK --> Etape suivante\r\n");
                 osDelay(500);
                 action_done = 0;
                 state++;
             }
             else
             {
-                send_UART3("STS invalide. Corrigez les erreurs ci-dessus.\n");
+                send_UART3("STS invalide. Corrigez les erreurs ci-dessus.\r\n");
             }
         }
         break;
@@ -165,14 +164,14 @@ void StateMachineTask(void)
                 {
                     dips_ok = false;
                     char msg[50];
-                    sprintf(msg, "ERROR: DIP %d à ON !\n", i + 1); // On affiche l'état des DIPs en défaut
+                    sprintf(msg, "ERROR: DIP %d a ON !\r\n", i + 1); // On affiche l'état des DIPs en défaut
                     send_UART3(msg);
                 }
             }
 
             if (dips_ok)
             {
-                send_UART3("DIP switches OK\n");
+                send_UART3("DIP a OFF --> OK\r\n");
                 osDelay(500);
                 state++;
                 bp_pressed = 0;
@@ -180,7 +179,7 @@ void StateMachineTask(void)
             }
             else
             {
-                send_UART3("DIP switches NOK : Tous les DIPs ne sont pas à OFF, mettez les à OFF et rappuyez sur le bouton\n");
+                send_UART3("DIP NOK : Tous les DIPs ne sont pas a OFF, mettez les a OFF et rappuyez sur le bouton\r\n");
                 bp_pressed = 0;
             }
         }
@@ -204,14 +203,14 @@ void StateMachineTask(void)
                 {
                     dips_ok = false;
                     char msg[50];
-                    sprintf(msg, "ERROR: DIP %d à OFF !\n", i + 1); // On affiche l'état des DIPs en défaut
+                    sprintf(msg, "ERROR: DIP %d a OFF !\r\n", i + 1); // On affiche l'état des DIPs en défaut
                     send_UART3(msg);
                 }
             }
 
             if (dips_ok)
             {
-                send_UART3("DIP switches OK\n");
+                send_UART3("DIP a ON --> OK\r\n");
                 osDelay(500);
                 state++;
                 action_done = 0;
@@ -219,7 +218,7 @@ void StateMachineTask(void)
             }
             else
             {
-                send_UART3("DIP switches NOK : Tous les DIPs ne sont pas à ON, mettez les à ON et rappuyez sur le bouton\n");
+                send_UART3("DIP NOK : Tous les DIPs ne sont pas a ON, mettez les a ON et rappuyez sur le bouton\r\n");
                 bp_pressed = 0;
             }
         }
@@ -242,14 +241,14 @@ void StateMachineTask(void)
                 {
                     inps_ok = false;
                     char msg[50];
-                    sprintf(msg, "ERROR: Entrée %d à ON!", i + 1); // On affiche l'état des entrées
+                    sprintf(msg, "ERROR: Entree %d a ON!\r\n", i + 1); // On affiche l'état des entrées
                     send_UART3(msg);
                 }
             }
 
             if (inps_ok)
             {
-                send_UART3("Entrées à OFF --> OK\n");
+                send_UART3("Entrees a OFF --> OK\r\n");
                 osDelay(500);
                 state++;
                 action_done = 0;
@@ -265,7 +264,6 @@ void StateMachineTask(void)
 
             bool inps_ok = true;
 
-            send_UART3((char *)rx_buffer1); //DEBUG
             TrameDataSTS data = {0};
             parse_data_STS((char *)rx_buffer1, &data);
 
@@ -276,14 +274,14 @@ void StateMachineTask(void)
                 {
                     inps_ok = false;
                     char msg[50];
-                    sprintf(msg, "ERROR: Entrée %d à OFF!", i + 1); // On affiche l'état des entrées
+                    sprintf(msg, "ERROR: Entree %d a OFF!\r\n", i + 1); // On affiche l'état des entrées
                     send_UART3(msg);
                 }
             }
 
             if (inps_ok)
             {
-                send_UART3("Entrées à ON --> OK\n");
+                send_UART3("Entrees a ON --> OK\r\n");
                 osDelay(500);
                 state++;
                 action_done = 0;
@@ -291,19 +289,71 @@ void StateMachineTask(void)
         }
         break;
 
+    case 9: // Cellule JOUR
+    	if(!HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin)){
+    	Check_UART1_Timeout();
+    	        if (message_complete1)
+    	        {
+    	            message_complete1 = 0;
 
+    	            TrameDataSTS data = {0};
+    	            parse_data_STS((char *)rx_buffer1, &data);
+
+    	            if(data.cel_mode == 'J'){
+    	            	send_UART3("Cellule JOUR --> OK\r\n");
+    	            	osDelay(500);
+    	            	state++;
+    	            	action_done = 0;
+    	            }else{
+    	            	send_UART3("Défaut cellule en NUIT, veuillez réessayer\r\n");
+    	            	action_done = 0;
+    	            }
+    	        }
+    	}
+    	break;
+
+    case 10: //Cellule NUIT
+    	if(!HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin)){
+        	Check_UART1_Timeout();
+        	        if (message_complete1)
+        	        {
+        	            message_complete1 = 0;
+
+        	            TrameDataSTS data = {0};
+        	            parse_data_STS((char *)rx_buffer1, &data);
+
+        	            if(data.cel_mode == 'N'){
+        	            	send_UART3("Cellule NUIT --> OK\r\n");
+        	                osDelay(500);
+        	            	state++;
+        	            	action_done = 0;
+        	            }else{
+        	            	send_UART3("Défaut cellule en JOUR, veuillez réessayer\r\n");
+        	            	action_done = 0;
+        	            }
+        	        }
+    	}
+      break;
     }
+
+
 
     //--------------------------- ACTIONS
     switch (state)
     {
     case 0:
+    	if (!action_done)
+    	{
+    		//On met bien les I/0 par défaut
+    	HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_RESET);
-        if (!action_done)
-        {
+        HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
+
+
             send_UART3("ETAPE 0\n");
             osDelay(10);
             send_UART3("Appuyer sur le bouton pour commencer\n");
@@ -343,7 +393,7 @@ void StateMachineTask(void)
                 send_UART1(cmd);
                 osDelay(10);
                 send_UART1(cmd);
-                send_UART3("PER envoyé. Attente confirmation…\n");
+                send_UART3("PER envoye. Attente confirmation…\n");
                 osDelay(1000);
                 send_UART1("PER\r");
                 osDelay(50);
@@ -368,7 +418,7 @@ void StateMachineTask(void)
     case 3:
         if (!action_done)
         {
-            send_UART3("Mettez les DIPs à OFF et appuyez sur le bouton\n");
+            send_UART3("Mettez les DIPs a OFF et appuyez sur le bouton\n");
             osDelay(500);
             action_done = 1;
         }
@@ -383,7 +433,7 @@ void StateMachineTask(void)
     case 4:
         if (!action_done)
         {
-            send_UART3("Mettez les DIPs à ON, appuyez sur le BP reset et appuyez sur le bouton\n");
+            send_UART3("Mettez les DIPs a ON, appuyez sur le BP reset et appuyez sur le bouton\n");
             osDelay(500);
             action_done = 1;
         }
@@ -412,12 +462,13 @@ void StateMachineTask(void)
     case 6: // Entrées à ON
         if (!action_done)
         {
-            send_UART3("Test entrees à ON en cours...\n");
+            send_UART3("Test entrees à ON en cours...\r\n");
+            osDelay(1000);
             // Activation de toutes les entrées
             HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_RESET);
-            osDelay(1000);
+            osDelay(500);
             send_UART1("STS\r");
             action_done = 1;
         }
@@ -438,43 +489,55 @@ void StateMachineTask(void)
     	if (!action_done)
     	{
     		send_UART1("TST=0\r"); // On arrête le test décompteur
-    		send_UART3("Test des ampoules ...\n\r Vérifiez que les ampoules s'éteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien à la bonne ampoule\n\rEnsuite appuyez sur le bouton pour valider");
+    		send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'éteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton pour valider\n\r");
+    		osDelay(2500);
+    		HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
+    		osDelay(2500);
+    		HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
+    		HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
+    		osDelay(2500);
+    		HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
+    		HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
+    		osDelay(2500);
+    		HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
     		action_done = 1;
     	}
-    	HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
-    	osDelay(2000);
-    	HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
-    	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
-    	osDelay(2000);
-    	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
-    	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
-    	osDelay(2000);
-    	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
     	break;
-    case 9: // Test cellule
+    case 9: // Test cellule Jour
     	// on remet les relais à l'état initial
-    	HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
-    	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
-    	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
     	if(!action_done){
-
-    	send_UART3("Test cellule, veuillez exposé la cellule à la lumière, puis reset la carte en cachant la cellule et constatez que la luminosité est bien différente");
+    	osDelay(1000);
+    	HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
+    	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
+    	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
+    	send_UART3("Test cellule JOUR, veuillez exposer la cellule a la lumière\r\nappuyez sur le bouton pour tester\r\n");
+    	send_UART1("STS\r");
     	action_done = 1;
     	}
     	 break;
 
-
-    case 10:// Test IR
+    case 10: //Test cellule Nuit
     	if(!action_done){
+    	osDelay(1000);
+    	send_UART3("Test cellule NUIT, veuillez cacher la cellule et reset la cart\r\nappuyez sur le bouton pour tester");
+    	send_UART1("STS\r");
+    	action_done=1;
+    	}
+    	break;
 
-    	send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le BP si la télécommande fonctionne en émission et réception");
+
+    case 11:// Test IR
+    	if(!action_done){
+    	osDelay(1000);
+    	send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le BP si la telecommande fonctionne en emission et reception");
     	action_done = 1;
     	}
         break;
-    case 11:
+    case 12:
     	if(!action_done){
+    	osDelay(1000);
         HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_SET);
-        send_UART3("Test de l'accu...\n Veuillez vérifier que vous avez bien le message suppression batterie qui s'affiche à l'écran, si le cas validez");
+        send_UART3("Test de l'accu...\n Veuillez verifier que vous avez bien le message suppression batterie qui s'affiche à l'écran, si le cas validez");
     	action_done=1;
     	}
         break;
