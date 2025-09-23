@@ -486,7 +486,7 @@ void StateMachineTask(void)
     		    	HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
     		    	HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
     		    	send_UART3("---- ETAPE 7 ----\n");
-    		        send_UART3("Test du décompteur...\n Veuillez valider en appuyant sur le BP si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur");
+    		        send_UART3("Test du décompteur...\n Veuillez valider en appuyant sur le BP si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur\n\r");
     		        send_UART1("TST=1\r");
     		        action_done = 1;
     	        }
@@ -528,7 +528,7 @@ void StateMachineTask(void)
     	if(!action_done){
     	osDelay(1000);
     	send_UART3("---- ETAPE 10 ----\n");
-    	send_UART3("Test cellule NUIT, veuillez cacher la cellule et reset la cart\r\nappuyez sur le bouton pour tester");
+    	send_UART3("Test cellule NUIT, veuillez cacher la cellule et reset la cart\r\nappuyez sur le bouton pour tester\n\r");
     	send_UART1("STS\r");
     	action_done=1;
     	}
