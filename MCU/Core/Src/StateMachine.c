@@ -46,7 +46,37 @@ void parse_data_STS(char *buffer, TrameDataSTS *data);
 void StateMachineTask(void)
 {
     static bool action_done = 0;
-    static bool bp_pressed = 0;
+    static bool bp_pressed = 0, bp3_pressed = 0, bp4_pressed = 0;
+
+
+
+    //--------------------------- Vérification de l'appui sur BP3 pour revenir à l'étape précédente
+    if (!HAL_GPIO_ReadPin(BP3_GPIO_Port, BP3_Pin) && state > 0 && !bp3_pressed)
+        {
+            // Si BP3 est pressé et qu'on n'est pas déjà revenu à l'étape précédente
+            state--;  // On revient à l'étape précédente
+            action_done = 0;
+            bp3_pressed = 1;
+            osDelay(250);
+        }
+    else
+    {
+    	bp3_pressed = 0;
+    }
+    //--------------------------- Vérification de l'appui sur BP4 pour reset (étape 0)
+    if (!HAL_GPIO_ReadPin(BP4_GPIO_Port, BP4_Pin) && !bp4_pressed)
+            {
+                // Si BP3 est pressé et qu'on n'est pas déjà revenu à l'étape précédente
+                state = 0;  // On revient à l'étape 0
+                action_done = 0;
+                bp4_pressed = 1;
+                osDelay(250);
+            }
+    else
+    {
+    	bp4_pressed =  0;
+    }
+
 
     //--------------------------- TRANSITIONS
     switch (state)
@@ -65,11 +95,6 @@ void StateMachineTask(void)
         		state = 0;
         	}
 
-            action_done = 0;
-        }
-        else if (!HAL_GPIO_ReadPin(BP3_GPIO_Port, BP3_Pin) && state > 0)
-        {
-            state--;
             action_done = 0;
         }
         break;
@@ -110,7 +135,7 @@ void StateMachineTask(void)
             bool bat_ok = false;
 
             // Vérification ACC
-            if (data.acc >= 8.5 && data.acc <= 10.0)
+            if (data.acc >= 8 && data.acc <= 10.0)
             {
                 send_UART3("Accu OK\n");
                 acc_ok = true;
@@ -132,7 +157,7 @@ void StateMachineTask(void)
             }
 
             // Transition si tout est bon
-            if (/*acc_ok && */ bat_ok)
+            if (acc_ok &&  bat_ok)
             {
                 send_UART3("STS OK --> Etape suivante\r\n");
                 osDelay(500);
