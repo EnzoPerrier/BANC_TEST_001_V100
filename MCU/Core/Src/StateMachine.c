@@ -137,7 +137,7 @@ void StateMachineTask(void)
             send_UART3((char *)rx_buffer1); // On a besoin de traiter la trame dans le logiciel de test
 
             // Vérification ACC
-            if (data.acc >= 8 && data.acc <= 10.0)
+            if (data.acc >= 8.0 && data.acc <= 10.0)
             {
                 //send_UART3("Accu OK\n"); // Utile pour test via terminal
                 acc_ok = true;
@@ -148,7 +148,7 @@ void StateMachineTask(void)
             }
 
             // Vérification BAT
-            if (data.bat >= 11.5 && data.bat <= 13.0)
+            if (data.bat >= 11.0 && data.bat <= 14.0)
             {
                 //send_UART3("Tension batterie OK\r\n"); // Utile pour test via
                 bat_ok = true;
