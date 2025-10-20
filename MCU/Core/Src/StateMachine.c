@@ -440,6 +440,8 @@ void StateMachineTask(void)
             send_UART3("Test STS en cours ...\r\n");
             osDelay(500);
             send_UART1("STS\r");
+            osDelay(500);
+            send_UART3((char *)rx_buffer1);
             action_done = 1;
         }
         break;
@@ -546,6 +548,7 @@ void StateMachineTask(void)
     	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
     	send_UART3("---- ETAPE 9 ----\r\n");
     	send_UART3("Test cellule JOUR, veuillez exposer la cellule a la lumière\r\nappuyez sur le bouton pour tester\r\n");
+    	HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_SET);
     	send_UART1("STS\r");
     	action_done = 1;
     	}
@@ -553,6 +556,7 @@ void StateMachineTask(void)
 
     case 10: //Test cellule Nuit
     	if(!action_done){
+    		HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_RESET);
     	osDelay(1000);
     	send_UART3("---- ETAPE 10 ----\r\n");
     	send_UART3("Test cellule NUIT, veuillez cacher la cellule et reset la cart\r\nappuyez sur le bouton pour tester\n\r");
