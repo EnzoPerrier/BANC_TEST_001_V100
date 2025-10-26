@@ -1,0 +1,11 @@
+../Core/Src/uart.c:51:6:MX_USART1_UART_Init	2
+../Core/Src/uart.c:79:6:send_UART1	1
+../Core/Src/uart.c:84:6:clear_rx_buffer1	1
+../Core/Src/uart.c:94:6:MX_USART2_UART_Init	2
+../Core/Src/uart.c:122:6:send_UART2	1
+../Core/Src/uart.c:128:6:clear_rx_buffer2	1
+../Core/Src/uart.c:138:6:MX_USART3_UART_Init	2
+../Core/Src/uart.c:167:6:send_UART3	1
+../Core/Src/uart.c:172:6:clear_rx_buffer3	1
+../Core/Src/uart.c:178:6:HAL_UART_RxCpltCallback	10
+../Core/Src/uart.c:238:6:Check_UART1_Timeout	5
