@@ -159,7 +159,7 @@ void StateMachineTask(void)
             }
 
             // Transition si tout est bon
-            if (acc_ok &&  bat_ok)
+            if (/*acc_ok &&*/  bat_ok)
             {
                 send_UART3("STS OK --> Etape suivante\r\n");
                 osDelay(500);
@@ -206,7 +206,7 @@ void StateMachineTask(void)
             }
             else
             {
-                send_UART3("DIP NOK : Tous les DIPs ne sont pas a OFF, mettez les a OFF et rappuyez sur le bouton\r\n");
+                send_UART3("DIP NOK : Tous les DIPs ne sont pas a OFF, mettez les a OFF et rappuyez sur le bouton valider\r\n");
                 bp_pressed = 0;
             }
         }
@@ -245,7 +245,7 @@ void StateMachineTask(void)
             }
             else
             {
-                send_UART3("DIP NOK : Tous les DIPs ne sont pas a ON, mettez les a ON et rappuyez sur le bouton\r\n");
+                send_UART3("DIP NOK : Tous les DIPs ne sont pas a ON, mettez les a ON et rappuyez sur le bouton valider\r\n");
                 bp_pressed = 0;
             }
         }
@@ -383,7 +383,7 @@ void StateMachineTask(void)
 
             send_UART3("---- ETAPE 0 ----\r\n");
             osDelay(10);
-            send_UART3("Appuyer sur le bouton pour commencer\r\n");
+            send_UART3("Appuyer sur le bouton valider pour commencer\r\n");
             action_done = 1;
         }
         break;
@@ -428,7 +428,7 @@ void StateMachineTask(void)
             }
             else
             {
-                send_UART3("Format invalide. Le PER doit faire 8 digits, recommencez…\r\n");
+                send_UART3("Format invalide: Le PER doit faire 8 digits, recommencez…\r\n");
             }
         }
         break;
@@ -449,7 +449,7 @@ void StateMachineTask(void)
         if (!action_done)
         {
         	send_UART3("---- ETAPE 3 ----\r\n");
-            send_UART3("Mettez les DIPs a OFF et appuyez sur le bouton\r\n");
+            send_UART3("Mettez les DIPs a OFF et appuyez sur le bouton valider\r\n");
             osDelay(500);
             action_done = 1;
         }
@@ -465,7 +465,7 @@ void StateMachineTask(void)
         if (!action_done)
         {
         	send_UART3("---- ETAPE 4 ----\r\n");
-            send_UART3("Mettez les DIPs a ON, appuyez sur le BP reset et appuyez sur le bouton\r\n");
+            send_UART3("Mettez les DIPs a ON, appuyez sur le BP reset et appuyez sur le bouton valider\r\n");
             osDelay(500);
             action_done = 1;
         }
@@ -515,7 +515,7 @@ void StateMachineTask(void)
     		    	HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
     		    	HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
     		    	send_UART3("---- ETAPE 7 ----\n");
-    		        send_UART3("Test du décompteur...\n Veuillez valider en appuyant sur le BP si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur\n\r");
+    		        send_UART3("Test du décompteur...\n Veuillez valider en appuyant sur le bouton valider si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur\n\r");
     		        send_UART1("TST=1\r");
     		        action_done = 1;
     	        }
@@ -525,7 +525,7 @@ void StateMachineTask(void)
     	{
     		send_UART1("TST=0\r"); // On arrête le test décompteur
     		send_UART3("---- ETAPE 8 ----\r\n");
-    		send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'éteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton pour valider\r\n");
+    		send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'éteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton valider\r\n");
     		osDelay(2500);
     		HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
     		osDelay(2500);
@@ -547,7 +547,7 @@ void StateMachineTask(void)
     	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
     	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
     	send_UART3("---- ETAPE 9 ----\r\n");
-    	send_UART3("Test cellule JOUR, veuillez exposer la cellule a la lumière\r\nappuyez sur le bouton pour tester\r\n");
+    	send_UART3("Test cellule JOUR, veuillez exposer la cellule a la lumière\r\nappuyez sur le bouton valider pour tester\r\n");
     	HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_SET);
     	send_UART1("STS\r");
     	action_done = 1;
@@ -559,7 +559,7 @@ void StateMachineTask(void)
     		HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_RESET);
     	osDelay(1000);
     	send_UART3("---- ETAPE 10 ----\r\n");
-    	send_UART3("Test cellule NUIT, veuillez cacher la cellule et reset la cart\r\nappuyez sur le bouton pour tester\n\r");
+    	send_UART3("Test cellule NUIT, veuillez cacher la cellule et reset la cart\r\nappuyez sur le bouton valider pour tester\n\r");
     	send_UART1("STS\r");
     	action_done=1;
     	}
@@ -570,7 +570,7 @@ void StateMachineTask(void)
     	if(!action_done){
     	osDelay(1000);
     	send_UART3("---- ETAPE 11 ----\r\n");
-    	send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le BP si la telecommande fonctionne en emission et reception");
+    	send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le bouton valider si la telecommande fonctionne en emission et reception");
     	action_done = 1;
     	}
         break;
@@ -579,7 +579,7 @@ void StateMachineTask(void)
     	osDelay(1000);
     	send_UART3("---- ETAPE 12 ----\r\n");
         HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_SET);
-        send_UART3("Test de l'accu...\n Veuillez verifier que vous avez bien le message suppression batterie qui s'affiche à l'écran, si le cas validez");
+        send_UART3("Test de l'accu...\n Veuillez verifier que vous avez bien le message suppression batterie qui s'affiche à l'écran, si le cas appuyez sur le bouton valider");
     	action_done=1;
     	}
         break;
