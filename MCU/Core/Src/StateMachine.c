@@ -373,6 +373,7 @@ void StateMachineTask(void)
     	{
     		//On met bien les I/0 par défaut
     	HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_RESET);
+    	HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
@@ -523,6 +524,7 @@ void StateMachineTask(void)
     case 8: // Défauts ampoules
     	if (!action_done)
     	{
+    		HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_RESET);
     		send_UART1("TST=0\r"); // On arrête le test décompteur
     		send_UART3("---- ETAPE 8 ----\r\n");
     		send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'éteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton valider\r\n");
