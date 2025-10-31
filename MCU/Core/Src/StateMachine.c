@@ -384,7 +384,7 @@ void StateMachineTask(void)
 
             send_UART3("---- ETAPE 0 ----\r\n");
             osDelay(10);
-            send_UART3("Appuyer sur le bouton valider pour commencer\r\n");
+            send_UART3("Appuyez sur le bouton valider pour commencer\r\n");
             action_done = 1;
         }
         break;
