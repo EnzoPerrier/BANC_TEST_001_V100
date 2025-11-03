@@ -570,6 +570,7 @@ void StateMachineTask(void)
 
     case 11:// Test IR
     	if(!action_done){
+    	HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_RESET);
     	osDelay(1000);
     	send_UART3("---- ETAPE 11 ----\r\n");
     	send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le bouton valider si la telecommande fonctionne en emission et reception");
