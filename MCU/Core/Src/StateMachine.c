@@ -144,7 +144,7 @@ void StateMachineTask(void)
             }
             else
             {
-                send_UART3("Accu NOK : Valeur hors plage !!\r\n");
+                send_UART3("STS NOK: Valeur ACCU hors plage !!\r\n");
             }
 
             // Vérification BAT
@@ -155,11 +155,11 @@ void StateMachineTask(void)
             }
             else
             {
-                send_UART3("Tension batterie NOK : Valeur hors plage !!\r\n");
+                send_UART3("STS NOK: Valeur BAT hors plage !!\r\n");
             }
 
             // Transition si tout est bon
-            if (/*acc_ok &&*/  bat_ok)
+            if (acc_ok && bat_ok)
             {
                 send_UART3("STS OK --> Etape suivante\r\n");
                 osDelay(500);
