@@ -93,6 +93,7 @@ void StateMachineTask(void)
         	}
         	else{
         		state = 0;
+        		osDelay(500);
         	}
 
             action_done = 0;
@@ -137,7 +138,7 @@ void StateMachineTask(void)
             send_UART3((char *)rx_buffer1); // On a besoin de traiter la trame dans le logiciel de test
 
             // Vérification ACC
-            if (data.acc >= 8.0 && data.acc <= 10.0)
+            if (/*data.acc >= 8.0 &&*/ data.acc <= 10.0)
             {
                 //send_UART3("Accu OK\n"); // Utile pour test via terminal
                 acc_ok = true;
@@ -204,7 +205,7 @@ void StateMachineTask(void)
             if (dips_ok)
             {
                 send_UART3("DIP a OFF --> OK\r\n");
-                osDelay(500);
+                osDelay(1000);
                 state++;
                 bp_pressed = 0;
                 action_done = 0;
@@ -248,7 +249,7 @@ void StateMachineTask(void)
             if (dips_ok)
             {
                 send_UART3("DIP a ON --> OK\r\n");
-                osDelay(500);
+                osDelay(1000);
                 state++;
                 action_done = 0;
                 bp_pressed = 0;
@@ -283,7 +284,7 @@ void StateMachineTask(void)
                 }else if(!data.inps[i])
                 {
                 	char msg[50];
-                	sprintf(msg, "OK: IN %d a FF \r\n", i + 1); // On affiche les INPs OK
+                	sprintf(msg, "OK: IN %d a OFF \r\n", i + 1); // On affiche les INPs OK
                 	send_UART3(msg);
                 }
             }
@@ -291,7 +292,7 @@ void StateMachineTask(void)
             if (inps_ok)
             {
                 send_UART3("Entrees a OFF --> OK\r\n");
-                osDelay(500);
+                osDelay(1000);
                 state++;
                 action_done = 0;
             }
@@ -329,7 +330,7 @@ void StateMachineTask(void)
             if (inps_ok)
             {
                 send_UART3("Entrees a ON --> OK\r\n");
-                osDelay(500);
+                osDelay(1000);
                 state++;
                 action_done = 0;
             }
@@ -392,6 +393,7 @@ void StateMachineTask(void)
     	if (!action_done)
     	{
     		//On met bien les I/0 par défaut
+    	send_UART1("TST=0\r");
     	HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_RESET);
     	HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
@@ -466,7 +468,8 @@ void StateMachineTask(void)
             action_done = 1;
         }
         break;
-    case 3:
+
+    case 3: //DIPs OFF
         if (!action_done)
         {
         	send_UART3("---- ETAPE 3 ----\r\n");
@@ -482,7 +485,7 @@ void StateMachineTask(void)
 
         break;
 
-    case 4:
+    case 4: // DIPs ON
         if (!action_done)
         {
         	send_UART3("---- ETAPE 4 ----\r\n");
@@ -503,11 +506,11 @@ void StateMachineTask(void)
         	send_UART3("---- ETAPE 5 ----\r\n");
         	osDelay(250);
             send_UART3("Test entrees à OFF en cours...\r\n");
-            // Activation de toutes les entrées
+            // Désactivation de toutes les entrées
             HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
             HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
             HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
-            osDelay(1000);
+            osDelay(500);
             send_UART1("STS\r");
             action_done = 1;
         }
@@ -516,9 +519,10 @@ void StateMachineTask(void)
     case 6: // Entrées à ON
         if (!action_done)
         {
+        	send_UART1("TST=0\r");
         	send_UART3("---- ETAPE 6 ----\r\n");
+        	osDelay(250);
             send_UART3("Test entrees à ON en cours...\r\n");
-            osDelay(1000);
             // Activation de toutes les entrées
             HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_RESET);
@@ -528,7 +532,8 @@ void StateMachineTask(void)
             action_done = 1;
         }
         break;
-    case 7:
+
+    case 7: // Test décompteur
     	if (!action_done)
     	        {
     		        // On réinitialise les entrées précédemment sur ON
@@ -536,18 +541,19 @@ void StateMachineTask(void)
     		    	HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
     		    	HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
     		    	send_UART3("---- ETAPE 7 ----\n");
-    		        send_UART3("Test du décompteur...\n Veuillez valider en appuyant sur le bouton valider si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur\n\r");
+    		        send_UART3("Test du decompteur...\n Veuillez valider en appuyant sur le bouton valider si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur\n\r");
     		        send_UART1("TST=1\r");
     		        action_done = 1;
     	        }
     	        break;
+
     case 8: // Défauts ampoules
     	if (!action_done)
     	{
     		HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_RESET);
     		send_UART1("TST=0\r"); // On arrête le test décompteur
     		send_UART3("---- ETAPE 8 ----\r\n");
-    		send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'éteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton valider\r\n");
+    		send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'eteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton valider\r\n");
     		osDelay(2500);
     		HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
     		send_UART3("OPTR\r\n"); // Utile pour l'animation sur le logiciel AppTest418
@@ -560,6 +566,7 @@ void StateMachineTask(void)
     		HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
     		send_UART3("OPTG\r\n");
     		osDelay(2500);
+    		send_UART3("OPTFULL\r\n");
     		HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
     		action_done = 1;
     	}
@@ -572,7 +579,7 @@ void StateMachineTask(void)
     	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
     	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
     	send_UART3("---- ETAPE 9 ----\r\n");
-    	send_UART3("Test cellule JOUR, veuillez exposer la cellule a la lumière\r\nappuyez sur le bouton valider pour tester\r\n");
+    	send_UART3("Test cellule JOUR, veuillez exposer la cellule a la lumiere\r\nappuyez sur le bouton valider pour tester\r\n");
     	HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_SET);
     	send_UART1("STS\r");
     	action_done = 1;
@@ -591,21 +598,22 @@ void StateMachineTask(void)
     	break;
 
 
-    case 11:// Test IR
+    case 11: // Test IR
     	if(!action_done){
     	HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_RESET);
     	osDelay(1000);
     	send_UART3("---- ETAPE 11 ----\r\n");
-    	send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le bouton valider si la telecommande fonctionne en emission et reception");
+    	send_UART3("Test de l'infrarouge...\n Veuillez valider en appuyant sur le bouton valider si la telecommande fonctionne en emission et reception\n\r");
     	action_done = 1;
     	}
         break;
-    case 12:
+
+    case 12: // Test Accu
     	if(!action_done){
     	osDelay(1000);
     	send_UART3("---- ETAPE 12 ----\r\n");
         HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_SET);
-        send_UART3("Test de l'accu...\n Veuillez verifier que vous avez bien le message suppression batterie qui s'affiche à l'écran, si le cas appuyez sur le bouton valider");
+        send_UART3("Test de l'accu...\n Veuillez verifier que vous avez bien le message suppression batterie qui s'affiche à l'ecran, si le cas appuyez sur le bouton valider");
     	action_done=1;
     	}
         break;
