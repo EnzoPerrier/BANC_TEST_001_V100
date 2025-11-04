@@ -193,6 +193,11 @@ void StateMachineTask(void)
                     char msg[50];
                     sprintf(msg, "ERROR: DIP %d a ON !\r\n", i + 1); // On affiche l'état des DIPs en défaut
                     send_UART3(msg);
+                }else if(!data.dips[i])
+                {
+                	char msg[50];
+                	sprintf(msg, "OK: DIP %d a OFF \r\n", i + 1); // On affiche les DIPs OK
+                	send_UART3(msg);
                 }
             }
 
@@ -232,6 +237,11 @@ void StateMachineTask(void)
                     char msg[50];
                     sprintf(msg, "ERROR: DIP %d a OFF !\r\n", i + 1); // On affiche l'état des DIPs en défaut
                     send_UART3(msg);
+                }else if(data.dips[i])
+                {
+                	char msg[50];
+                	sprintf(msg, "OK: DIP %d a ON \r\n", i + 1); // On affiche les DIPs OK
+                	send_UART3(msg);
                 }
             }
 
@@ -268,8 +278,13 @@ void StateMachineTask(void)
                 {
                     inps_ok = false;
                     char msg[50];
-                    sprintf(msg, "ERROR: Entree %d a ON!\r\n", i + 1); // On affiche l'état des entrées
+                    sprintf(msg, "ERROR: IN %d a ON!\r\n", i + 1); // On affiche l'état des entrées
                     send_UART3(msg);
+                }else if(!data.inps[i])
+                {
+                	char msg[50];
+                	sprintf(msg, "OK: IN %d a FF \r\n", i + 1); // On affiche les INPs OK
+                	send_UART3(msg);
                 }
             }
 
@@ -301,8 +316,13 @@ void StateMachineTask(void)
                 {
                     inps_ok = false;
                     char msg[50];
-                    sprintf(msg, "ERROR: Entree %d a OFF!\r\n", i + 1); // On affiche l'état des entrées
+                    sprintf(msg, "ERROR: IN %d a OFF!\r\n", i + 1); // On affiche l'état des entrées
                     send_UART3(msg);
+                }else if(data.inps[i])
+                {
+                	char msg[50];
+                	sprintf(msg, "OK: IN %d a ON \r\n", i + 1); // On affiche les INPs OK
+                	send_UART3(msg);
                 }
             }
 
