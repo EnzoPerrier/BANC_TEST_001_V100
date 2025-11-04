@@ -438,8 +438,8 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    // HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); //DEBUG
-    osDelay(1000);
+    HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); //DEBUG
+    osDelay(500);
   }
   /* USER CODE END 5 */
 }

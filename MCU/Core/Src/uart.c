@@ -177,7 +177,7 @@ void clear_rx_buffer3(void)
 // Callback
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); // DEBUG
+  //HAL_GPIO_TogglePin(OUT4_GPIO_Port, OUT4_Pin); // DEBUG
 
   // RS232_418
   if (huart->Instance == USART1)
