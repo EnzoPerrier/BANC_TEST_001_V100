@@ -249,7 +249,7 @@ void StateMachineTask(void)
             if (dips_ok)
             {
                 send_UART3("DIP a ON --> OK\r\n");
-                osDelay(1000);
+                osDelay(1500);
                 state++;
                 action_done = 0;
                 bp_pressed = 0;
@@ -292,7 +292,7 @@ void StateMachineTask(void)
             if (inps_ok)
             {
                 send_UART3("Entrees a OFF --> OK\r\n");
-                osDelay(1000);
+                osDelay(2000);
                 state++;
                 action_done = 0;
             }
@@ -330,7 +330,7 @@ void StateMachineTask(void)
             if (inps_ok)
             {
                 send_UART3("Entrees a ON --> OK\r\n");
-                osDelay(1000);
+                osDelay(2000);
                 state++;
                 action_done = 0;
             }
