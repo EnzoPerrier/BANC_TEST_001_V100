@@ -353,7 +353,7 @@ void StateMachineTask(void)
     	            	state++;
     	            	action_done = 0;
     	            }else{
-    	            	send_UART3("Défaut cellule en NUIT, veuillez réessayer\r\n");
+    	            	send_UART3("ERROR: Defaut cellule en NUIT, veuillez reessayer\r\n");
     	            	action_done = 0;
     	            }
     	        }
@@ -376,7 +376,7 @@ void StateMachineTask(void)
         	            	state++;
         	            	action_done = 0;
         	            }else{
-        	            	send_UART3("Défaut cellule en JOUR, veuillez réessayer\r\n");
+        	            	send_UART3("ERROR: Defaut cellule en JOUR, veuillez reessayer\r\n");
         	            	action_done = 0;
         	            }
         	        }
