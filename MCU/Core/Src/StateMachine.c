@@ -138,7 +138,7 @@ void StateMachineTask(void)
             send_UART3((char *)rx_buffer1); // On a besoin de traiter la trame dans le logiciel de test
 
             // Vérification ACC
-            if (/*data.acc >= 8.0 &&*/ data.acc <= 10.0)
+            if (data.acc >= 8.0 && data.acc <= 10.0)
             {
                 //send_UART3("Accu OK\n"); // Utile pour test via terminal
                 acc_ok = true;
@@ -162,8 +162,8 @@ void StateMachineTask(void)
             // Transition si tout est bon
             if (acc_ok && bat_ok)
             {
+            	osDelay(1000);
                 send_UART3("STS OK --> Etape suivante\r\n");
-                osDelay(500);
                 action_done = 0;
                 state++;
             }
