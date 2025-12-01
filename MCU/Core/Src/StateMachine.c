@@ -403,6 +403,14 @@ void StateMachineTask(void)
         HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
 
+        // Nettoyer tous les buffers UART
+        memset(rx_buffer1, 0, RX_BUFFER1_SIZE);
+        memset(rx_buffer3, 0, RX_BUFFER3_SIZE);  // <-- CRITIQUE !
+
+
+        // Réinitialiser aussi per_value
+        memset(per_value, 0, sizeof(per_value));
+
 
             send_UART3("---- ETAPE 0 ----\r\n");
             osDelay(10);
@@ -413,6 +421,8 @@ void StateMachineTask(void)
     case 1:
         if (!action_done)
         {
+        	memset(rx_buffer3, 0, RX_BUFFER3_SIZE);
+
         	send_UART3("---- ETAPE 1 ----\n");
             send_UART3("Entrez le PER (juste la valeur sur 8 digits)\r\n");
             action_done = 1;
@@ -422,7 +432,7 @@ void StateMachineTask(void)
         {
             message_complete3 = 0;
             // Nettoyer la chaîne des caractères \r et \n
-            char cleaned_buffer[20];
+            char cleaned_buffer[MAX_PER_LENGTH + 1] = {0}; // Initialise le buffer pour corriger le bug ("PER doit faire 8 digits")
             int i = 0;
             // Copier les caractères sauf \r et \n
             for (int j = 0; j < strlen((char *)rx_buffer3); j++)
@@ -435,7 +445,7 @@ void StateMachineTask(void)
             cleaned_buffer[i] = '\0'; // Terminer la chaîne propre
 
             // Vérifier la longueur après nettoyage
-            if (strlen(cleaned_buffer) == MAX_PER_LENGTH)
+            if (i == MAX_PER_LENGTH)
             {
                 strncpy(per_value, cleaned_buffer, MAX_PER_LENGTH);
 
@@ -535,17 +545,17 @@ void StateMachineTask(void)
 
     case 7: // Test décompteur
     	if (!action_done)
-    	        {
+    	{
     		        // On réinitialise les entrées précédemment sur ON
-    		    	HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
-    		    	HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
-    		    	HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
-    		    	send_UART3("---- ETAPE 7 ----\n");
-    		        send_UART3("Test du decompteur...\n Veuillez valider en appuyant sur le bouton valider si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur\n\r");
-    		        send_UART1("TST=1\r");
-    		        action_done = 1;
-    	        }
-    	        break;
+    		HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
+    		HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
+    		HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
+    		send_UART3("---- ETAPE 7 ----\n");
+    		send_UART3("Test du decompteur...\n Veuillez valider en appuyant sur le bouton valider si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur\n\r");
+    		send_UART1("TST=1\r");
+    		action_done = 1;
+    	}
+    	break;
 
     case 8: // Défauts ampoules
     	if (!action_done)
