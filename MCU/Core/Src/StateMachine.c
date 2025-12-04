@@ -514,8 +514,8 @@ void StateMachineTask(void)
         if (!action_done)
         {
         	send_UART3("---- ETAPE 5 ----\r\n");
-        	osDelay(250);
             send_UART3("Test entrees à OFF en cours...\r\n");
+            osDelay(500);
             // Désactivation de toutes les entrées
             HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
             HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
@@ -531,8 +531,8 @@ void StateMachineTask(void)
         {
         	send_UART1("TST=0\r");
         	send_UART3("---- ETAPE 6 ----\r\n");
-        	osDelay(250);
             send_UART3("Test entrees à ON en cours...\r\n");
+            osDelay(500);
             // Activation de toutes les entrées
             HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_RESET);
@@ -551,7 +551,7 @@ void StateMachineTask(void)
     		HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
     		HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
     		send_UART3("---- ETAPE 7 ----\n");
-    		send_UART3("Test du decompteur...\n Veuillez valider en appuyant sur le bouton valider si toutes les leds s'allument correctement et dans le bon ordre sur le décompteur\n\r");
+    		send_UART3("Test du decompteur...\n Veuillez valider en appuyant sur le bouton valider si toutes les leds s'allument correctement et dans le bon ordre sur le decompteur\n\r");
     		send_UART1("TST=1\r");
     		action_done = 1;
     	}
@@ -563,7 +563,7 @@ void StateMachineTask(void)
     		HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_RESET);
     		send_UART1("TST=0\r"); // On arrête le test décompteur
     		send_UART3("---- ETAPE 8 ----\r\n");
-    		send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'eteignent et se rallument et que le défaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton valider\r\n");
+    		send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'eteignent et se rallument et que le defaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton valider\r\n");
     		osDelay(2500);
     		HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
     		send_UART3("OPTR\r\n"); // Utile pour l'animation sur le logiciel AppTest418
@@ -584,12 +584,12 @@ void StateMachineTask(void)
     case 9: // Test cellule Jour
     	// on remet les relais à l'état initial
     	if(!action_done){
-    	osDelay(1000);
     	HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
     	HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
     	HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
     	send_UART3("---- ETAPE 9 ----\r\n");
     	send_UART3("Test cellule JOUR, veuillez exposer la cellule a la lumiere\r\nappuyez sur le bouton valider pour tester\r\n");
+    	osDelay(1000);
     	HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_SET);
     	send_UART1("STS\r");
     	action_done = 1;
@@ -598,10 +598,10 @@ void StateMachineTask(void)
 
     case 10: //Test cellule Nuit
     	if(!action_done){
-    		HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_RESET);
-    	osDelay(1000);
+    	HAL_GPIO_WritePin(LED_CEL_GPIO_Port, LED_CEL_Pin, GPIO_PIN_RESET);
     	send_UART3("---- ETAPE 10 ----\r\n");
-    	send_UART3("Test cellule NUIT, veuillez cacher la cellule et reset la cart\r\nappuyez sur le bouton valider pour tester\n\r");
+    	send_UART3("Test cellule NUIT, veuillez cacher la cellule et reset la carte\r\nappuyez sur le bouton valider pour tester\n\r");
+    	osDelay(1000);
     	send_UART1("STS\r");
     	action_done=1;
     	}

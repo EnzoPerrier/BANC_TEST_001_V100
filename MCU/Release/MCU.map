@@ -2847,14 +2847,15 @@ LOAD C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .rodata        0x08009168        0xc C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-nano-vfscanf_i.o)
  *(.rodata*)
  .rodata.parse_data_STS.str1.1
-                0x08009174      0xc48 ./Core/Src/StateMachine.o
+                0x08009174      0xc47 ./Core/Src/StateMachine.o
                                  0x9e (size before relaxing)
  .rodata.StateMachineTask.str1.1
-                0x08009dbc      0x998 ./Core/Src/StateMachine.o
+                0x08009dbb      0x997 ./Core/Src/StateMachine.o
  .rodata.Error_Handler.str1.1
-                0x08009dbc        0x6 ./Core/Src/main.o
+                0x08009dbb        0x6 ./Core/Src/main.o
  .rodata.str1.1
-                0x08009dbc       0x1d ./Core/Src/main.o
+                0x08009dbb       0x1d ./Core/Src/main.o
+ *fill*         0x08009dbb        0x1 
  .rodata.StateMachineTask_attributes
                 0x08009dbc       0x24 ./Core/Src/main.o
                 0x08009dbc                StateMachineTask_attributes
