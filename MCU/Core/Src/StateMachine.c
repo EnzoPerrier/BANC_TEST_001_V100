@@ -162,7 +162,7 @@ void StateMachineTask(void)
             // Transition si tout est bon
             if (acc_ok && bat_ok)
             {
-            	osDelay(1000);
+            	osDelay(1500);
                 send_UART3("STS OK --> Etape suivante\r\n");
                 action_done = 0;
                 state++;
@@ -205,7 +205,7 @@ void StateMachineTask(void)
             if (dips_ok)
             {
                 send_UART3("DIP a OFF --> OK\r\n");
-                osDelay(1000);
+                osDelay(1500);
                 state++;
                 bp_pressed = 0;
                 action_done = 0;
@@ -292,7 +292,7 @@ void StateMachineTask(void)
             if (inps_ok)
             {
                 send_UART3("Entrees a OFF --> OK\r\n");
-                osDelay(2000);
+                osDelay(1500);
                 state++;
                 action_done = 0;
             }
@@ -330,7 +330,7 @@ void StateMachineTask(void)
             if (inps_ok)
             {
                 send_UART3("Entrees a ON --> OK\r\n");
-                osDelay(2000);
+                osDelay(1500);
                 state++;
                 action_done = 0;
             }
@@ -349,7 +349,7 @@ void StateMachineTask(void)
 
     	            if(data.cel_mode == 'J'){
     	            	send_UART3("Cellule JOUR --> OK\r\n");
-    	            	osDelay(500);
+    	            	osDelay(1500);
     	            	state++;
     	            	action_done = 0;
     	            }else{
@@ -372,7 +372,7 @@ void StateMachineTask(void)
 
         	            if(data.cel_mode == 'N'){
         	            	send_UART3("Cellule NUIT --> OK\r\n");
-        	                osDelay(500);
+        	                osDelay(1500);
         	            	state++;
         	            	action_done = 0;
         	            }else{
