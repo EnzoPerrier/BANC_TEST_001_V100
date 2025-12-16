@@ -90,6 +90,7 @@ void StateMachineTask(void)
         {
         	if(state < 12){
         		state++;
+        		osDelay(250);
         	}
         	else{
         		state = 0;
