@@ -83,9 +83,10 @@ void StateMachineTask(void)
     case 8:
     case 11:
     case 12:
+    case 13:
         if (!HAL_GPIO_ReadPin(BP2_GPIO_Port, BP2_Pin))
         {
-            if (state < 12)
+            if (state < 13)
             {
                 state++;
                 osDelay(250);
@@ -93,7 +94,7 @@ void StateMachineTask(void)
             else
             {
                 state = 0;
-                osDelay(500);
+                osDelay(250);
             }
 
             action_done = 0;
@@ -597,18 +598,18 @@ void StateMachineTask(void)
             send_UART1("TST=0\r"); // On arrête le test décompteur
             send_UART3("---- ETAPE 8 ----\r\n");
             send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'eteignent et se rallument et que le defaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton valider\r\n");
-            osDelay(2500);
+            osDelay(1500);
             HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
             send_UART3("OPTR\r\n"); // Utile pour l'animation sur le logiciel AppTest418
-            osDelay(2500);
+            osDelay(1500);
             HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
             send_UART3("OPTY\r\n");
-            osDelay(2500);
+            osDelay(1500);
             HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
             send_UART3("OPTG\r\n");
-            osDelay(2500);
+            osDelay(1500);
             send_UART3("OPTFULL\r\n");
             HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
             action_done = 1;
@@ -663,6 +664,20 @@ void StateMachineTask(void)
             action_done = 1;
         }
         break;
+
+    case 13: // Test carte s'éteint après appui long sur  IN1
+            if (!action_done)
+            {
+                osDelay(1000);
+                send_UART3("---- ETAPE 13 ----\r\n");
+                HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
+                send_UART3("Test extinction de la carte à l'appui de 5s sur IN1");
+                osDelay(5750);
+                HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
+                action_done = 1;
+            }
+            break;
+
     default:
         break;
     }
