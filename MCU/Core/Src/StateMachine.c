@@ -441,7 +441,7 @@ void StateMachineTask(void)
         {
             memset(rx_buffer3, 0, RX_BUFFER3_SIZE);
 
-            send_UART3("---- ETAPE 1 ----\n");
+            send_UART3("---- ETAPE 1 ----\r\n");
             //send_UART3("Entrez le PER (juste la valeur sur 8 digits)\r\n");
             action_done = 1;
         }

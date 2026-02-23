@@ -2322,7 +2322,7 @@ void StateMachineTask(void)
  8001528:	481b      	ldr	r0, [pc, #108]	@ (8001598 <StateMachineTask+0x914>)
  800152a:	f007 fab4 	bl	8008a96 <memset>
 
-            send_UART3("---- ETAPE 1 ----\n");
+            send_UART3("---- ETAPE 1 ----\r\n");
  800152e:	481d      	ldr	r0, [pc, #116]	@ (80015a4 <StateMachineTask+0x920>)
  8001530:	f001 fa78 	bl	8002a24 <send_UART3>
             //send_UART3("Entrez le PER (juste la valeur sur 8 digits)\r\n");
