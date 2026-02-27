@@ -560,18 +560,20 @@ void StateMachineTask(void)
         }
         break;
 
-    case 6: // Entrées à ON
+    case 6: // ENtrées  à  ON
         if (!action_done)
         {
             send_UART1("TST=0\r");
             send_UART3("---- ETAPE 6 ----\r\n");
-            //send_UART3("Test entrees à ON en cours...\r\n");
             osDelay(500);
-            // Activation de toutes les entrées
             HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_RESET);
             osDelay(500);
+            // Nettoyage du buffer avant envoi STS
+            memset(rx_buffer1, 0, RX_BUFFER1_SIZE);
+            rx_index1 = 0;
+            message_complete1 = 0;
             send_UART1("STS\r");
             action_done = 1;
         }
