@@ -2688,8 +2688,8 @@ void StateMachineTask(void)
  80017d6:	2108      	movs	r1, #8
  80017d8:	4846      	ldr	r0, [pc, #280]	@ (80018f4 <StateMachineTask+0xc70>)
  80017da:	f001 ffc0 	bl	800375e <HAL_GPIO_WritePin>
-            osDelay(500);
- 80017de:	f44f 70fa 	mov.w	r0, #500	@ 0x1f4
+            osDelay(800);
+ 80017de:	f44f 7048 	mov.w	r0, #800	@ 0x320
  80017e2:	f004 f9a1 	bl	8005b28 <osDelay>
             send_UART1("STS\r");
  80017e6:	483a      	ldr	r0, [pc, #232]	@ (80018d0 <StateMachineTask+0xc4c>)
@@ -2735,8 +2735,8 @@ void StateMachineTask(void)
  8001832:	2108      	movs	r1, #8
  8001834:	482f      	ldr	r0, [pc, #188]	@ (80018f4 <StateMachineTask+0xc70>)
  8001836:	f001 ff92 	bl	800375e <HAL_GPIO_WritePin>
-            osDelay(500);
- 800183a:	f44f 70fa 	mov.w	r0, #500	@ 0x1f4
+            osDelay(800);
+ 800183a:	f44f 7048 	mov.w	r0, #800	@ 0x320
  800183e:	f004 f973 	bl	8005b28 <osDelay>
             // Nettoyage du buffer avant envoi STS
             memset(rx_buffer1, 0, RX_BUFFER1_SIZE);
@@ -2847,51 +2847,51 @@ void StateMachineTask(void)
  800192a:	4880      	ldr	r0, [pc, #512]	@ (8001b2c <StateMachineTask+0xea8>)
  800192c:	f001 f886 	bl	8002a3c <send_UART3>
             //send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'eteignent et se rallument et que le defaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton valider\r\n");
-            osDelay(1500);
- 8001930:	f240 50dc 	movw	r0, #1500	@ 0x5dc
+            osDelay(1250);
+ 8001930:	f240 40e2 	movw	r0, #1250	@ 0x4e2
  8001934:	f004 f8f8 	bl	8005b28 <osDelay>
-            HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
- 8001938:	2201      	movs	r2, #1
- 800193a:	2120      	movs	r1, #32
- 800193c:	487c      	ldr	r0, [pc, #496]	@ (8001b30 <StateMachineTask+0xeac>)
- 800193e:	f001 ff0e 	bl	800375e <HAL_GPIO_WritePin>
             send_UART3("OPTR\r\n"); // Utile pour l'animation sur le logiciel AppTest418
+ 8001938:	487d      	ldr	r0, [pc, #500]	@ (8001b30 <StateMachineTask+0xeac>)
+ 800193a:	f001 f87f 	bl	8002a3c <send_UART3>
+            HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
+ 800193e:	2201      	movs	r2, #1
+ 8001940:	2120      	movs	r1, #32
  8001942:	487c      	ldr	r0, [pc, #496]	@ (8001b34 <StateMachineTask+0xeb0>)
- 8001944:	f001 f87a 	bl	8002a3c <send_UART3>
-            osDelay(1500);
- 8001948:	f240 50dc 	movw	r0, #1500	@ 0x5dc
+ 8001944:	f001 ff0b 	bl	800375e <HAL_GPIO_WritePin>
+            osDelay(2000);
+ 8001948:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
  800194c:	f004 f8ec 	bl	8005b28 <osDelay>
             HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
  8001950:	2200      	movs	r2, #0
  8001952:	2120      	movs	r1, #32
- 8001954:	4876      	ldr	r0, [pc, #472]	@ (8001b30 <StateMachineTask+0xeac>)
+ 8001954:	4877      	ldr	r0, [pc, #476]	@ (8001b34 <StateMachineTask+0xeb0>)
  8001956:	f001 ff02 	bl	800375e <HAL_GPIO_WritePin>
-            HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
- 800195a:	2201      	movs	r2, #1
- 800195c:	2140      	movs	r1, #64	@ 0x40
- 800195e:	4874      	ldr	r0, [pc, #464]	@ (8001b30 <StateMachineTask+0xeac>)
- 8001960:	f001 fefd 	bl	800375e <HAL_GPIO_WritePin>
             send_UART3("OPTY\r\n");
- 8001964:	4874      	ldr	r0, [pc, #464]	@ (8001b38 <StateMachineTask+0xeb4>)
- 8001966:	f001 f869 	bl	8002a3c <send_UART3>
-            osDelay(1500);
- 800196a:	f240 50dc 	movw	r0, #1500	@ 0x5dc
+ 800195a:	4877      	ldr	r0, [pc, #476]	@ (8001b38 <StateMachineTask+0xeb4>)
+ 800195c:	f001 f86e 	bl	8002a3c <send_UART3>
+            HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
+ 8001960:	2201      	movs	r2, #1
+ 8001962:	2140      	movs	r1, #64	@ 0x40
+ 8001964:	4873      	ldr	r0, [pc, #460]	@ (8001b34 <StateMachineTask+0xeb0>)
+ 8001966:	f001 fefa 	bl	800375e <HAL_GPIO_WritePin>
+            osDelay(2000);
+ 800196a:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
  800196e:	f004 f8db 	bl	8005b28 <osDelay>
             HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
  8001972:	2200      	movs	r2, #0
  8001974:	2140      	movs	r1, #64	@ 0x40
- 8001976:	486e      	ldr	r0, [pc, #440]	@ (8001b30 <StateMachineTask+0xeac>)
+ 8001976:	486f      	ldr	r0, [pc, #444]	@ (8001b34 <StateMachineTask+0xeb0>)
  8001978:	f001 fef1 	bl	800375e <HAL_GPIO_WritePin>
-            HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
- 800197c:	2201      	movs	r2, #1
- 800197e:	2180      	movs	r1, #128	@ 0x80
- 8001980:	486b      	ldr	r0, [pc, #428]	@ (8001b30 <StateMachineTask+0xeac>)
- 8001982:	f001 feec 	bl	800375e <HAL_GPIO_WritePin>
             send_UART3("OPTG\r\n");
- 8001986:	486d      	ldr	r0, [pc, #436]	@ (8001b3c <StateMachineTask+0xeb8>)
- 8001988:	f001 f858 	bl	8002a3c <send_UART3>
-            osDelay(1500);
- 800198c:	f240 50dc 	movw	r0, #1500	@ 0x5dc
+ 800197c:	486f      	ldr	r0, [pc, #444]	@ (8001b3c <StateMachineTask+0xeb8>)
+ 800197e:	f001 f85d 	bl	8002a3c <send_UART3>
+            HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
+ 8001982:	2201      	movs	r2, #1
+ 8001984:	2180      	movs	r1, #128	@ 0x80
+ 8001986:	486b      	ldr	r0, [pc, #428]	@ (8001b34 <StateMachineTask+0xeb0>)
+ 8001988:	f001 fee9 	bl	800375e <HAL_GPIO_WritePin>
+            osDelay(2000);
+ 800198c:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
  8001990:	f004 f8ca 	bl	8005b28 <osDelay>
             send_UART3("OPTFULL\r\n");
  8001994:	486a      	ldr	r0, [pc, #424]	@ (8001b40 <StateMachineTask+0xebc>)
@@ -2899,7 +2899,7 @@ void StateMachineTask(void)
             HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
  800199a:	2200      	movs	r2, #0
  800199c:	2180      	movs	r1, #128	@ 0x80
- 800199e:	4864      	ldr	r0, [pc, #400]	@ (8001b30 <StateMachineTask+0xeac>)
+ 800199e:	4865      	ldr	r0, [pc, #404]	@ (8001b34 <StateMachineTask+0xeb0>)
  80019a0:	f001 fedd 	bl	800375e <HAL_GPIO_WritePin>
             action_done = 1;
  80019a4:	4b5e      	ldr	r3, [pc, #376]	@ (8001b20 <StateMachineTask+0xe9c>)
@@ -2921,17 +2921,17 @@ void StateMachineTask(void)
             HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
  80019bc:	2200      	movs	r2, #0
  80019be:	2120      	movs	r1, #32
- 80019c0:	485b      	ldr	r0, [pc, #364]	@ (8001b30 <StateMachineTask+0xeac>)
+ 80019c0:	485c      	ldr	r0, [pc, #368]	@ (8001b34 <StateMachineTask+0xeb0>)
  80019c2:	f001 fecc 	bl	800375e <HAL_GPIO_WritePin>
             HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
  80019c6:	2200      	movs	r2, #0
  80019c8:	2140      	movs	r1, #64	@ 0x40
- 80019ca:	4859      	ldr	r0, [pc, #356]	@ (8001b30 <StateMachineTask+0xeac>)
+ 80019ca:	485a      	ldr	r0, [pc, #360]	@ (8001b34 <StateMachineTask+0xeb0>)
  80019cc:	f001 fec7 	bl	800375e <HAL_GPIO_WritePin>
             HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
  80019d0:	2200      	movs	r2, #0
  80019d2:	2180      	movs	r1, #128	@ 0x80
- 80019d4:	4856      	ldr	r0, [pc, #344]	@ (8001b30 <StateMachineTask+0xeac>)
+ 80019d4:	4857      	ldr	r0, [pc, #348]	@ (8001b34 <StateMachineTask+0xeb0>)
  80019d6:	f001 fec2 	bl	800375e <HAL_GPIO_WritePin>
             send_UART3("---- ETAPE 9 ----\r\n");
  80019da:	485a      	ldr	r0, [pc, #360]	@ (8001b44 <StateMachineTask+0xec0>)
@@ -3000,7 +3000,7 @@ void StateMachineTask(void)
             HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_RESET);
  8001a46:	2200      	movs	r2, #0
  8001a48:	f44f 4180 	mov.w	r1, #16384	@ 0x4000
- 8001a4c:	4838      	ldr	r0, [pc, #224]	@ (8001b30 <StateMachineTask+0xeac>)
+ 8001a4c:	4839      	ldr	r0, [pc, #228]	@ (8001b34 <StateMachineTask+0xeb0>)
  8001a4e:	f001 fe86 	bl	800375e <HAL_GPIO_WritePin>
             osDelay(1000);
  8001a52:	f44f 707a 	mov.w	r0, #1000	@ 0x3e8
@@ -3035,7 +3035,7 @@ void StateMachineTask(void)
             HAL_GPIO_WritePin(RELAIS_ALIM_418_GPIO_Port, RELAIS_ALIM_418_Pin, GPIO_PIN_SET);
  8001a84:	2201      	movs	r2, #1
  8001a86:	f44f 4180 	mov.w	r1, #16384	@ 0x4000
- 8001a8a:	4829      	ldr	r0, [pc, #164]	@ (8001b30 <StateMachineTask+0xeac>)
+ 8001a8a:	482a      	ldr	r0, [pc, #168]	@ (8001b34 <StateMachineTask+0xeb0>)
  8001a8c:	f001 fe67 	bl	800375e <HAL_GPIO_WritePin>
             //send_UART3("Test de l'accu...\n Veuillez verifier que vous avez bien le message suppression batterie qui s'affiche à l'ecran, si le cas appuyez sur le bouton valider\r\n");
             action_done = 1;
@@ -3064,7 +3064,7 @@ void StateMachineTask(void)
                 HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
  8001ab4:	2200      	movs	r2, #0
  8001ab6:	f44f 4100 	mov.w	r1, #32768	@ 0x8000
- 8001aba:	481d      	ldr	r0, [pc, #116]	@ (8001b30 <StateMachineTask+0xeac>)
+ 8001aba:	481e      	ldr	r0, [pc, #120]	@ (8001b34 <StateMachineTask+0xeb0>)
  8001abc:	f001 fe4f 	bl	800375e <HAL_GPIO_WritePin>
                 //send_UART3("Test extinction de la carte à l'appui de 5s sur IN1\r\n");
                 osDelay(5750);
@@ -3073,7 +3073,7 @@ void StateMachineTask(void)
                 HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
  8001ac8:	2201      	movs	r2, #1
  8001aca:	f44f 4100 	mov.w	r1, #32768	@ 0x8000
- 8001ace:	4818      	ldr	r0, [pc, #96]	@ (8001b30 <StateMachineTask+0xeac>)
+ 8001ace:	4819      	ldr	r0, [pc, #100]	@ (8001b34 <StateMachineTask+0xeb0>)
  8001ad0:	f001 fe45 	bl	800375e <HAL_GPIO_WritePin>
                 action_done = 1;
  8001ad4:	4b12      	ldr	r3, [pc, #72]	@ (8001b20 <StateMachineTask+0xe9c>)
@@ -3138,8 +3138,8 @@ void StateMachineTask(void)
  8001b24:	40010800 	.word	0x40010800
  8001b28:	0800c608 	.word	0x0800c608
  8001b2c:	0800c738 	.word	0x0800c738
- 8001b30:	40010c00 	.word	0x40010c00
- 8001b34:	0800c74c 	.word	0x0800c74c
+ 8001b30:	0800c74c 	.word	0x0800c74c
+ 8001b34:	40010c00 	.word	0x40010c00
  8001b38:	0800c754 	.word	0x0800c754
  8001b3c:	0800c75c 	.word	0x0800c75c
  8001b40:	0800c764 	.word	0x0800c764

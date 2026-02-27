@@ -554,7 +554,7 @@ void StateMachineTask(void)
             HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
             HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);
             HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET);
-            osDelay(500);
+            osDelay(800);
             send_UART1("STS\r");
             action_done = 1;
         }
@@ -569,7 +569,7 @@ void StateMachineTask(void)
             HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_RESET);
-            osDelay(500);
+            osDelay(800);
             // Nettoyage du buffer avant envoi STS
             memset(rx_buffer1, 0, RX_BUFFER1_SIZE);
             rx_index1 = 0;
@@ -600,18 +600,18 @@ void StateMachineTask(void)
             send_UART1("TST=0\r"); // On arrête le test décompteur
             send_UART3("---- ETAPE 8 ----\r\n");
             //send_UART3("Test des ampoules ...\n\r Verifiez que les ampoules s'eteignent et se rallument et que le defaut sur l'écran LCD de la carte corresponde bien a la bonne optique\n\rEnsuite appuyez sur le bouton valider\r\n");
-            osDelay(1500);
-            HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
+            osDelay(1250);
             send_UART3("OPTR\r\n"); // Utile pour l'animation sur le logiciel AppTest418
-            osDelay(1500);
+            HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_SET);
+            osDelay(2000);
             HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
             send_UART3("OPTY\r\n");
-            osDelay(1500);
+            HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_SET);
+            osDelay(2000);
             HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
             send_UART3("OPTG\r\n");
-            osDelay(1500);
+            HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_SET);
+            osDelay(2000);
             send_UART3("OPTFULL\r\n");
             HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin, GPIO_PIN_RESET);
             action_done = 1;
