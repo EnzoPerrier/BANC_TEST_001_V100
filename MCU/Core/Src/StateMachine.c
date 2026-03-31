@@ -101,7 +101,7 @@ void StateMachineTask(void)
         }
         break;
     case 1:
-        Check_UART1_Timeout(); // Permer de vérifier si on a fini de recevoir le message et retoure message_complete1
+        Check_UART1_Timeout(); // Permet de vérifier si on a fini de recevoir le message et retoure message_complete1
 
         if (message_complete1)
         {
@@ -439,6 +439,10 @@ void StateMachineTask(void)
     case 1:
         if (!action_done)
         {
+        	memset(rx_buffer1, 0, RX_BUFFER1_SIZE);
+        	message_complete1 = 0;
+        	rx_index1 = 0;
+
             memset(rx_buffer3, 0, RX_BUFFER3_SIZE);
 
             send_UART3("---- ETAPE 1 ----\r\n");
