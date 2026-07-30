@@ -593,6 +593,7 @@ void StateMachineTask(void)
             send_UART3("---- ETAPE 7 ----\r\n");
             //send_UART3("Test du decompteur...\n Veuillez valider en appuyant sur le bouton valider si toutes les leds s'allument correctement et dans le bon ordre sur le decompteur\n\r");
             send_UART1("TST=1\r");
+            osDelay(1500); // Délai pour éviter de passer trop vite à l'étape suivante
             action_done = 1;
         }
         break;
